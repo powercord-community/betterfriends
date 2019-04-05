@@ -1,0 +1,53 @@
+
+.bf-friend {
+   margin: 6px;
+   width: 32px;
+   height: 32px;
+   float: left;
+   border-radius: 360px;
+}
+
+.bf-friend-name {
+   color: white;
+   float: left;
+   font-family: 'Whitney','Helvetica Neue','Helvetica','Arial',sans-serif;
+   font-weight: 700;
+   margin-left: 8px;
+   font-size: 20px;
+}
+
+.bf-friend-discrim {
+   color: hsla(0,0%,100%,.6);
+   float: left;
+   font-family: 'Whitney','Helvetica Neue','Helvetica','Arial',sans-serif;
+   font-size: 16px;
+   position: relative;
+   top: 4px;
+   padding-right: 6px;
+   &.bf-friend-discrim::before {
+      content: '#';
+   }
+}
+
+.bf-friend-name, .bf-friend-discrim {
+   margin-top: 8px;
+}
+
+.bf-friends-container { 
+   background-color: #23272A;
+   border-radius: 3px;
+   padding-top: 4px;
+   padding-bottom: 4px;
+   margin: 6px;
+   z-index: 99;
+   display: inline-block;
+   cursor: pointer;
+   transition: all 0.15s ease;
+   &.bf-friend-selected {
+      transition: all 0.15s ease;
+      background-color: #43b581 !important;
+      box-shadow: 1px 1px 10px 1px;
+      transform: scale(32px);
+   }
+}
+
