@@ -51,7 +51,7 @@ module.exports = class BetterFriends extends Plugin {
     };
 
     this.statusPopup = () => {
-      inject('bf-user', getUser, 'getUser', async (args, res) => {
+      inject('bf-user', getUser, 'getUser', (args, res) => {
         if (res && this.FAV_FRIENDS.includes(res.id)) {
           const status = getStatus(res.id);
           const previous = this.FRIEND_DATA.statusStorage[res.id];
