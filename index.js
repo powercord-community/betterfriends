@@ -4,7 +4,7 @@ const { waitFor, getOwnerInstance, sleep, createElement } = require('powercord/u
 const { React, ReactDOM, getModule } = require('powercord/webpack');
 const { Toast } = require('powercord/components');
 const { resolve } = require('path');
-const StatusHandler = require('./components/StatusHandler.jsx');
+const { StatusHandler, FriendChannel } = require('./components');
 const Settings = require('./Settings');
 
 
@@ -103,6 +103,17 @@ module.exports = class BetterFriends extends Plugin {
       const instancePrototype = Object.getPrototypeOf(updateInstance());
       updateInstance();
 
+      const friends = [];
+      for (const id of this.FAV_FRIENDS) {
+        const friend = getUser.getUser(id);
+        if (!this.FRIEND_DATA.statusStorage[friend.id]) {
+          this.FRIEND_DATA.statusStorage[friend.id] = getStatus(friend.id);
+        }
+        friends.push(React.createElement(FriendChannel, { user: friend,
+          status: this.FRIEND_DATA.statusStorage[friend.id] || 'offline',
+          statuses }));
+      }
+
       const FAV_FRIENDS_HEADER = React.createElement('header',
         { key: '.3',
           children: 'Favorite Friends'
@@ -111,7 +122,10 @@ module.exports = class BetterFriends extends Plugin {
       inject('bf-friendsList', instancePrototype, 'render', (args, res) => {
         this.log('Injected into friends panel!');
         this.log(res);
-        return [ FAV_FRIENDS_HEADER, res ];
+        if (res.props.children.props.to.pathname === '/channels/@me') {
+          return [ res, FAV_FRIENDS_HEADER, ...friends ];
+        }
+        return res;
       });
     };
 
