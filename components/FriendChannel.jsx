@@ -26,7 +26,7 @@ module.exports = class BetterFriendChannel extends React.Component {
     callNewTarget();
 
     transitionTo(target.firstChild.getAttribute("href"));
-    for (const elm of [ ...document.querySelectorAll('.pc-selected .pc-friendchannel') ]) {
+    for (const elm of [ ...document.querySelectorAll('.pc-friendchannel .pc-selected') ]) {
       elm.classList.remove('selected-1HYmZZ', 'pc-selected');
     }
     target.classList.add('selected-1HYmZZ', 'pc-selected');
