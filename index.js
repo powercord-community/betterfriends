@@ -16,15 +16,18 @@ module.exports = class BetterFriends extends Plugin {
     // Constants
     this.FAV_FRIENDS = this.settings.get('favfriends');
     this.FRIEND_DATA = {
-      statusStorage: {}
+      statusStorage: {},
+      lastMessageID: {}
     };
+    const MAXIMUM_STAR_RENDER = 500;
+    let STARS_RENDERED = [];
 
-    // Retrieve Mango's user object
     await waitFor('.pc-message');
     await waitFor('.pc-username');
     const getUser = getModule([ 'getUser' ]);
     const { getStatus } = getModule([ 'getStatus' ]);
-    const getMember = getModule([ 'getMember' ]);
+
+    const showStars = true || this.settings.config.showStar;
 
     // Register plugin in Settings menu
     this.registerSettings(
@@ -50,6 +53,76 @@ module.exports = class BetterFriends extends Plugin {
         class: 'offline-3qoTek' }
     };
 
+    this.information = () => {
+      inject('bf-user', getUser, 'getUser', (args, res) => {
+        if (res && this.FAV_FRIENDS.includes(res.id)) {
+          // add this
+        }
+      });
+    };
+
+
+    this.star = () => {
+      const createStar = async () => {
+        await waitFor('.pc-username');
+        STARS_RENDERED = STARS_RENDERED.sort((a, b) => a === b ? 0 : (a.compareDocumentPosition(b) & 2 ? 1 : -1));
+        for (let element of [ ...document.querySelectorAll('span.pc-username') ].filter(elm => this.FAV_FRIENDS.includes(elm.parentElement.parentElement.parentElement.parentElement.getAttribute('data-author-id')) && ![ ...elm.classList ].includes('bf-star')).sort((a, b) => a === b ? 0 : (a.compareDocumentPosition(b) & 2 ? 1 : -1))) {
+          STARS_RENDERED.push(element);
+          element = element.parentNode;
+          if (showStars && !element.querySelector('.bf-star')) {
+            const starElement = document.createElement('span');
+            starElement.classList.add('bf-star', 'bf-username');
+            element.appendChild(starElement);
+          }
+        }
+      };
+
+      const genericInjection = (res, id) => {
+        res.props['data-author-id'] = id;
+        if (this.FAV_FRIENDS.includes(id)) {
+          if (STARS_RENDERED.length > MAXIMUM_STAR_RENDER) {
+            for (const username of STARS_RENDERED) {
+              username.classList.remove('bf-star');
+              STARS_RENDERED = STARS_RENDERED.filter(item => item !== username);
+            }
+          }
+          createStar();
+        }
+      };
+
+      const INJECT_INTO = [
+        {
+          className: '.pc-message',
+          func (res, original) {
+            const { message } = res.props;
+            const { author } = message;
+            genericInjection(original, author.id);
+          }
+        },
+        {
+          className: '.pc-member',
+          func (res, original) {
+            const id = original.props.children.props.children[0].props.children.props.src.split('/')[4];
+            genericInjection(original, id);
+          }
+        }
+      ];
+
+      for (const injection of INJECT_INTO) {
+        const { className, func } = injection;
+        const selector = document.querySelector(className);
+        const updateInstance = () =>
+          (this.instance = getOwnerInstance(selector));
+        const instancePrototype = Object.getPrototypeOf(updateInstance());
+        updateInstance();
+
+        inject(`bf-star-${className}`, instancePrototype, 'render', function (_, res) {
+          func(this, res);
+          return res;
+        });
+      }
+    };
+
     this.statusPopup = () => {
       inject('bf-user', getUser, 'getUser', (args, res) => {
         if (res && this.FAV_FRIENDS.includes(res.id)) {
@@ -72,6 +145,7 @@ module.exports = class BetterFriends extends Plugin {
               },
               buttons: []
             });
+            // this.statusPopupInstance.forceUpdate();
             const render = async () => {
               const NotificationRenderer = ReactDOM.render(Notification, container);
               if (Notification && NotificationRenderer) {
@@ -99,40 +173,41 @@ module.exports = class BetterFriends extends Plugin {
       const injector = original.querySelector('div :nth-child(4)');
 
       const updateInstance = () =>
-        (this.instance = getOwnerInstance(injector));
+        (this.statusPopupInstance = getOwnerInstance(injector));
       const instancePrototype = Object.getPrototypeOf(updateInstance());
       updateInstance();
 
-      const friends = [];
-      for (const id of this.FAV_FRIENDS) {
-        const friend = getUser.getUser(id);
-        if (!this.FRIEND_DATA.statusStorage[friend.id]) {
-          this.FRIEND_DATA.statusStorage[friend.id] = getStatus(friend.id);
-        }
-        friends.push(React.createElement(FriendChannel, { user: friend,
-          status: this.FRIEND_DATA.statusStorage[friend.id] || 'offline',
-          statuses }));
-      }
-
-      const FAV_FRIENDS_HEADER = React.createElement('header',
-        { key: '.3',
-          children: 'Favorite Friends'
-        });
 
       inject('bf-friendsList', instancePrototype, 'render', (args, res) => {
+        const friends = [];
+        for (const id of this.FAV_FRIENDS) {
+          const friend = getUser.getUser(id);
+          if (!this.FRIEND_DATA.statusStorage[friend.id]) {
+            this.FRIEND_DATA.statusStorage[friend.id] = getStatus(friend.id);
+          }
+          friends.push(React.createElement(FriendChannel, { user: friend,
+            status: this.FRIEND_DATA.statusStorage[friend.id] || 'offline',
+            statuses }));
+        }
+
+        const FAV_FRIENDS_HEADER = React.createElement('header',
+          { key: '.3',
+            children: 'Favorite Friends'
+          });
         this.log('Injected into friends panel!');
-        this.log(res);
         if (res.props.children.props.to.pathname === '/channels/@me') {
           return [ res, FAV_FRIENDS_HEADER, ...friends ];
         }
         return res;
       });
+      this.statusPopupInstance.forceUpdate();
     };
 
     // Load modules
     this.MODULES = {
       friends: this.friends,
-      statusPopup: this.statusPopup
+      statusPopup: this.statusPopup,
+      star: this.star
     };
     this.load();
   }
