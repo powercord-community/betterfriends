@@ -54,15 +54,19 @@ module.exports = class BetterFriends extends Plugin {
     };
 
     this.information = () => {
-      inject('bf-user', getUser, 'getUser', (args, res) => {
-        if (res && this.FAV_FRIENDS.includes(res.id)) {
-          // add this
+      const mdl = getModule([ 'receiveMessage' ]);
+      inject('bf-message-listener', mdl, 'receiveMessage', (args, res) => {
+        const message = args[1];
+        if (message && this.FAV_FRIENDS.includes(message.author.id)) {
+          this.FRIEND_DATA.lastMessageID[message.author.id] = { id: message.id,
+            channel: message.channel_id };
         }
+        return res;
       });
     };
 
 
-    this.star = () => {
+    this.star = async () => {
       const createStar = async () => {
         await waitFor('.pc-username');
         STARS_RENDERED = STARS_RENDERED.sort((a, b) => a === b ? 0 : (a.compareDocumentPosition(b) & 2 ? 1 : -1));
@@ -110,6 +114,7 @@ module.exports = class BetterFriends extends Plugin {
 
       for (const injection of INJECT_INTO) {
         const { className, func } = injection;
+        await waitFor(className);
         const selector = document.querySelector(className);
         const updateInstance = () =>
           (this.instance = getOwnerInstance(selector));
@@ -187,7 +192,8 @@ module.exports = class BetterFriends extends Plugin {
           }
           friends.push(React.createElement(FriendChannel, { user: friend,
             status: this.FRIEND_DATA.statusStorage[friend.id] || 'offline',
-            statuses }));
+            statuses,
+            data: this }));
         }
 
         const FAV_FRIENDS_HEADER = React.createElement('header',
@@ -207,7 +213,8 @@ module.exports = class BetterFriends extends Plugin {
     this.MODULES = {
       friends: this.friends,
       statusPopup: this.statusPopup,
-      star: this.star
+      star: this.star,
+      information: this.information
     };
     this.load();
   }
