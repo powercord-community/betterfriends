@@ -51,3 +51,7 @@
    }
 }
 
+.bf-star::after {
+   padding-left: 4px;
+   content: '⭐';
+}
