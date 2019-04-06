@@ -53,5 +53,10 @@
 
 .bf-star::after {
    padding-left: 4px;
+   font-size: 12px;
    content: '⭐';
+}
+
+.bf-information {
+   background: url('/assets/4757a3d415435a57d4db6fca022872e3.svg');
 }
