@@ -161,7 +161,16 @@ module.exports = class BetterFriends extends Plugin {
               container.remove();
             };
             render();
+
+            for (const friend of [ ...document.querySelectorAll('.pc-friendchannel') ]) {
+              if (friend.querySelector('.pc-inner').getAttribute('user') === res.username) {
+                const statusDiv = friend.querySelector('.pc-status');
+                statusDiv.classList.remove(statuses[previous].class);
+                statusDiv.classList.add(statuses[status].class);
+              }
+            }
           }
+
           this.FRIEND_DATA.statusStorage[res.id] = status;
         }
         return res;
