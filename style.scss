@@ -51,12 +51,25 @@
    }
 }
 
-.bf-star::after {
-   padding-left: 4px;
-   font-size: 12px;
-   content: '⭐';
+.bf-star {
+   margin-left: 4px;
+   padding-left: 12px;
+   height: 12px;
+   background: url('https://canary.discordapp.com/assets/e4d52f4d69d7bba67e5fd70ffe26b70d.svg') 50% no-repeat;
+   background-size: 9px 9px;
 }
 
 .bf-information {
-   background: url('/assets/4757a3d415435a57d4db6fca022872e3.svg');
+   width: 15px;
+   height: 15px;
+   display: none;
+   opacity: .4;
+}
+
+.bf-information:hover {
+   opacity: .9;
+}
+
+.channel-2QD9_O:hover .bf-information {
+   display: block;
 }
