@@ -53,6 +53,73 @@ module.exports = class BetterFriends extends Plugin {
         class: 'offline-3qoTek' }
     };
 
+    this.favoriteFriendsTab = async () => {
+      if (!document.querySelector('.pc-tabBar')) {
+        await waitFor('.pc-tabBar');
+      }
+      if (!document.querySelector('.friendsRow-2yicud')) {
+        await waitFor('.friendsRow-2yicud');
+      }
+      const TOP_BAR = document.querySelector('.pc-tabBar');
+      const { setSection } = getModule(t => t.setSection && Object.keys(t).length === 1);
+      const COMPONENTS = {
+        FRIEND_TABLE: getOwnerInstance(document.querySelector('.friendsTable-133bsv')),
+        FRIEND_TABLE_HEADER: getOwnerInstance(document.querySelector('.friendsTableHeader-32yE7d')),
+        FRIEND_ROW: getOwnerInstance(document.querySelector('.friendsRow-2yicud'))
+      };
+      TOP_BAR.classList.add('bf-friends-top-bar');
+
+      const updateFavoriteFriendsTabInstance = () =>
+        (this.favoriteFriendsTabInstance = getOwnerInstance(TOP_BAR));
+      const instancePrototype = Object.getPrototypeOf(updateFavoriteFriendsTabInstance());
+      updateFavoriteFriendsTabInstance();
+
+      const populateFavoriteFriends = () => {
+        const originalRows = COMPONENTS.FRIEND_TABLE.state.rows;
+        if (!originalRows._rows) {
+          originalRows._rows = originalRows;
+        }
+        const rows = originalRows._rows.filter(n => this.FAV_FRIENDS.includes(n.key));
+
+        // instancePrototype.props.children[0].props.selectedItem = 'FAVORITED';
+        COMPONENTS.FRIEND_TABLE.setState({
+          rows,
+          section: () => true
+        });
+      };
+
+      const select = (e) => {
+        this.log('Favorited button clicked');
+        setSection('FAVORITED');
+        populateFavoriteFriends();
+        const { target } = e;
+        target.classList.add('itemSelected-1qLhcL', 'selected-3s45Ha', 'pc-itemSelected', 'pc-selected');
+      };
+
+      inject('bf-favorite-friends-tabbar', instancePrototype, 'render', (args, res) => {
+        if (res.props.children[0].props.selectedItem === 'FAVORITED') {
+          populateFavoriteFriends();
+        } else {
+          const elm = [ ...document.querySelectorAll('.itemSelected-1qLhcL.selected-3s45Ha') ].find(a => a.innerHTML === 'Favorited');
+          if (elm) {
+            elm.classList.remove('itemSelected-1qLhcL', 'selected-3s45Ha', 'pc-itemSelected', 'pc-selected');
+          }
+        }
+
+        const FAV_FRIENDS_BUTTON = React.createElement('div', {
+          id: 'FAVORITED',
+          selectedItem: res.props.children[0].props.selectedItem,
+          itemType: 'topPill-30KHOu',
+          className: 'itemDefault-3Jdr52 item-PXvHYJ notSelected-1N1G5p pc-itemDefault pc-item pc-notSelected item-3HpYcP pc-item',
+          onMouseDown: select
+        }, 'Favorited');
+
+        res.props.children.splice(3, 0, FAV_FRIENDS_BUTTON);
+        // Only inject in the first 'All' button
+        return res;
+      });
+    };
+
     this.information = () => {
       const mdl = getModule([ 'receiveMessage' ]);
       inject('bf-message-listener', mdl, 'receiveMessage', (args, res) => {
@@ -106,8 +173,10 @@ module.exports = class BetterFriends extends Plugin {
         {
           className: '.pc-member',
           func (res, original) {
-            const id = original.props.children.props.children[0].props.children.props.src.split('/')[4];
-            genericInjection(original, id);
+            if (original.props.children) {
+              const id = original.props.children.props.children[0].props.children.props.src.split('/')[4];
+              genericInjection(original, id);
+            }
           }
         }
       ];
@@ -184,7 +253,7 @@ module.exports = class BetterFriends extends Plugin {
       const DIRECT_MESSAGES_HEADER = [ ...document.querySelectorAll('header') ].find(a => a.innerHTML === 'Direct Messages');
       DIRECT_MESSAGES_HEADER.parentNode.classList.add('bf-friends-scroller');
       const original = document.querySelector('.pc-privateChannels .pc-scrollerWrap .pc-scroller');
-      const injector = original.querySelector('div :nth-child(4)');
+      const injector = [ ...original.querySelectorAll('a') ].find(el => el.href === 'https://canary.discordapp.com/channels/@me').parentElement;
 
       const updateInstance = () =>
         (this.statusPopupInstance = getOwnerInstance(injector));
@@ -193,6 +262,7 @@ module.exports = class BetterFriends extends Plugin {
 
 
       inject('bf-friendsList', instancePrototype, 'render', (args, res) => {
+        // const exists = [ ...document.querySelectorAll('header') ].find(a => a.innerHTML === 'Favorite Friends');
         const friends = [];
         for (const id of this.FAV_FRIENDS) {
           const friend = getUser.getUser(id);
@@ -205,17 +275,13 @@ module.exports = class BetterFriends extends Plugin {
             data: this }));
         }
 
-        const FAV_FRIENDS_HEADER = React.createElement('header',
-          { key: '.3',
-            children: 'Favorite Friends'
-          });
+        const FAV_FRIENDS_HEADER = React.createElement('header', { children: 'Favorite Friends' });
         this.log('Injected into friends panel!');
         if (res.props.children.props.to.pathname === '/channels/@me') {
           return [ res, FAV_FRIENDS_HEADER, ...friends ];
         }
         return res;
       });
-      this.statusPopupInstance.forceUpdate();
     };
 
     // Load modules
@@ -223,9 +289,15 @@ module.exports = class BetterFriends extends Plugin {
       friends: this.friends,
       statusPopup: this.statusPopup,
       star: this.star,
-      information: this.information
+      information: this.information,
+      favoriteFriendsTab: this.favoriteFriendsTab
     };
+
     this.load();
+    // Unload all modules if this user has no favorite friends
+    if (this.FAV_FRIENDS.length === 0) {
+      this.unload();
+    }
   }
 
   /**
@@ -277,7 +349,7 @@ module.exports = class BetterFriends extends Plugin {
     } else {
       this.log('Reloading all modules');
       this.unload();
-      this.start();
+      this.startPlugin();
     }
   }
 
