@@ -4,6 +4,8 @@ const { getDMFromUserId } = getModule([ 'getDMFromUserId' ]);
 const { open: openModal } = require('powercord/modal');
 const { transitionTo } = getModule([ 'transitionTo' ]);
 const InformationModal = require('./InformationModal');
+const { Tooltip } = require('powercord/components');
+const { Info } = require('powercord/components/Icons');
 
 module.exports = class BetterFriendChannel extends React.Component {
   constructor ({ user, status, statuses, data }) {
@@ -32,7 +34,7 @@ module.exports = class BetterFriendChannel extends React.Component {
     callNewTarget();
 
     transitionTo(target.firstChild.getAttribute('href'));
-    for (const elm of [ ...document.querySelectorAll('.pc-friendchannel .pc-selected') ]) {
+    for (const elm of [ ...document.querySelectorAll('.pc-friendchannel.pc-selected') ]) {
       elm.classList.remove('selected-1HYmZZ', 'pc-selected');
     }
     target.classList.add('selected-1HYmZZ', 'pc-selected');
@@ -59,7 +61,10 @@ module.exports = class BetterFriendChannel extends React.Component {
             <div class={`${this.statuses[this.status].class} status-oxiHuE pc-${this.status} pc-status small-5Os1Bb pc-small status-2zcSVk pc-status status-1ibiUI pc-status`}></div>
           </div>
           <div class="nameWrapper-10v56U pc-nameWrapper"><span class="name-2WpE7M pc-name">{this.user.username}</span></div>
-          <button class="close-3hZ5Ni bf-information" onClick={this.information_onlick}></button>
+
+          <Info class="bf-information" onClick={this.information_onlick}>
+            <Tooltip class="bf-information-tooltip" text='User Information' position='top'></Tooltip>
+          </Info>
         </a>
       </div>
     );
