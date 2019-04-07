@@ -39,10 +39,8 @@ module.exports = class InformationModal extends React.Component {
     amount: fm[4] } ];
     const properArr = [];
     for (const i in timeArr) {
-      if (timeArr[i].amount < 1) {
-        continue;
-      }
-      properArr.push(`${timeArr[i].amount} ${(timeArr[i].amount === 1 ? timeArr[i].type.singular : timeArr[i].type.plural).slice(0)}`);
+      if (timeArr[i].amount > 0)
+        properArr.push(`${timeArr[i].amount} ${(timeArr[i].amount === 1 ? timeArr[i].type.singular : timeArr[i].type.plural).slice(0)}`);
     }
     return (properArr.slice(0, -2).join(', ') + (properArr.slice(0, -2).length ? ', ' : '') + properArr.slice(-2).join(' and ')) || '0 seconds';
   }
@@ -53,7 +51,7 @@ module.exports = class InformationModal extends React.Component {
         red={false}
         header='Information'
         cancelText='Alright'
-        onCancel={() => closeModal()}
+        onCancel={closeModal}
       >
         <div className='bf-information-modal'>
           {(() => {
