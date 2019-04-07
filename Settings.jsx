@@ -2,7 +2,6 @@ const { React } = require('powercord/webpack');
 const { getModule } = require('powercord/webpack');
 const { getRelationships } = getModule([ 'getRelationships' ]);
 const { getUser } = getModule([ 'getUser' ]);
-const { SwitchItem, FormItem, Category } = require('powercord/components/settings');
 
 module.exports = class Settings extends React.Component {
   constructor (props) {
@@ -14,18 +13,24 @@ module.exports = class Settings extends React.Component {
     this.state = {
       favfriends: get('favfriends', [])
     };
-
-    const { getUser } = getModule([ 'getUser' ]);
   }
 
   render () {
-    const { favfriends } = this.state;
     return (
       <div>
         {Object.keys(getRelationships()).map((em) => {
           const user = getUser(em);
           return (<button type="button" class={`bf-friends-container pc-grow pc-button ${this.state.favfriends.find(a => a === em) ? 'bf-friend-selected' : ''}`} onClick={(e) => {
-            const target = ![ ...e.target.classList ].includes('bf-friends-container') ? e.target.parentNode : e.target;
+            let { target } = e;
+            const callNewTarget = () => {
+              target = target.parentNode;
+              if (![ ...target.classList ].includes('bf-friends-container')) {
+                callNewTarget();
+              }
+            };
+            if (![ ...target.classList ].includes('bf-friends-container')) {
+              callNewTarget();
+            }
 
             if (![ ...target.classList ].includes('bf-friend-selected')) {
               target.classList.add('bf-friend-selected');
@@ -33,8 +38,9 @@ module.exports = class Settings extends React.Component {
               this._set('favfriends', this.state.favfriends);
             } else {
               target.classList.remove('bf-friend-selected');
-              this._set('favfriends', this.state.favfriends.filter(a => a.id !== em.id));
+              this._set('favfriends', this.state.favfriends.filter(a => a !== em));
             }
+            this.plugin.reload('friends');
           }}>
             <div class='bf-friend-content'>
               <img class='bf-friend' src={!user.avatar ? `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png` : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}></img>
