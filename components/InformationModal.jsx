@@ -63,7 +63,7 @@ module.exports = class InformationModal extends React.Component {
             }
             const guild = getGuild(channel.guild_id);
             const message = getMessage(channel.id, this.message);
-            return (<div class='text-2F8PnX marginBottom20-32qID7 primary-jw0I4K'>{username} was last seen in #{channel.name} ({guild.name}) {message ? `around ${this.parse((Date.now() / 1000) - (message.timestamp / 1000))} ago` : ''}</div>);
+            return (<div class='text-2F8PnX marginBottom20-32qID7 primary-jw0I4K'>{username} was last seen in {guild ? `#${channel.name} (${guild.name})` : 'your DMs'} {message ? `around ${this.parse((Date.now() / 1000) - (message.timestamp / 1000))} ago` : ''}</div>);
           })()}
         </div>
       </Confirm>
