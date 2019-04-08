@@ -7,7 +7,7 @@ const { isFriend, isFavoriteFriend } = require('./../Constants');
 /*
  * [ Context Menu ]
  * Handles the creation of new buttons in context menus relating to favorite friends
- * Contributors: Joakim#9814, Bowser65#4928
+ * Contributors: Joakim#9814, Bowser65#0001
  */
 module.exports = async function () {
   const UserContextMenu = getModuleByDisplayName('UserContextMenu');
