@@ -3,6 +3,7 @@ const { uninject } = require('powercord/injector');
 const { React } = require('powercord/webpack');
 const { resolve } = require('path');
 const Settings = require('./Settings');
+const { InjectionIDs } = require('./Constants');
 
 
 module.exports = class BetterFriends extends Plugin {
@@ -63,7 +64,7 @@ module.exports = class BetterFriends extends Plugin {
    */
   load (specific) {
     if (specific) {
-      this[specific]();
+      this.MODULES[specific]();
     } else {
       for (const load of Object.keys(this.MODULES)) {
         this.MODULES[load]();
@@ -78,11 +79,15 @@ module.exports = class BetterFriends extends Plugin {
    */
   unload (specific) {
     if (specific) {
-      uninject(`bf-${specific}`);
+      for (const injection of InjectionIDs[specific]) {
+        uninject(injection);
+      }
     } else {
       this.log('Plugin stopped');
       for (const unload of Object.keys(this.MODULES)) {
-        uninject(`bf-${unload}`);
+        for (const injection of InjectionIDs[unload]) {
+          uninject(injection);
+        }
       }
       this.unloadCSS();
     }
@@ -97,11 +102,13 @@ module.exports = class BetterFriends extends Plugin {
    * When no module is specified, the entire plugin will reload
    * @param {String} specific Pass a specific module name to reload only that module
    */
-  reload (specific) {
+  reload (...specific) {
     if (specific) {
-      this.log(`Reloading module '${specific}'`);
-      this.unload(specific);
-      this.load(specific);
+      for (const mod of specific) {
+        this.log(`Reloading module '${mod}'`);
+        this.unload(mod);
+        this.load(mod);
+      }
     } else {
       this.log('Reloading all modules');
       this.unload();
