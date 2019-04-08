@@ -6,14 +6,14 @@ const { transitionTo } = getModule([ 'transitionTo' ]);
 const InformationModal = require('./InformationModal');
 const { Tooltip } = require('powercord/components');
 const { Info } = require('powercord/components/Icons');
+const { Statuses } = require('./../Constants');
 
 module.exports = class BetterFriendChannel extends React.Component {
-  constructor ({ user, status, statuses, data }) {
+  constructor ({ user, status, data }) {
     super();
 
     this.user = user;
     this.status = status;
-    this.statuses = statuses;
     this.data = data;
 
     // bind this to button click event
@@ -59,7 +59,7 @@ module.exports = class BetterFriendChannel extends React.Component {
         <a href={`/channels/@me/${getDMFromUserId(this.user.id)}`} onClick={this.userClick}>
           <div class="wrapper-2F3Zv8 pc-wrapper small-5Os1Bb pc-small forceDarkTheme-2cI4Hb pc-forceDarkTheme avatar-28BJzY pc-avatar avatarSmall-3ACRaI">
             <div user={this.user.username} status={this.status} class="inner-1W0Bkn pc-inner stop-animation" style={{ backgroundImage: `url(${this.user.avatarURL})` }}></div>
-            <div class={`${this.statuses[this.status].class} status-oxiHuE pc-${this.status} pc-status small-5Os1Bb pc-small status-2zcSVk pc-status status-1ibiUI pc-status`}></div>
+            <div class={`${Statuses[this.status].class} status-oxiHuE pc-${this.status} pc-status small-5Os1Bb pc-small status-2zcSVk pc-status status-1ibiUI pc-status`}></div>
           </div>
           <div class="nameWrapper-10v56U pc-nameWrapper"><span class="name-2WpE7M pc-name">{this.user.username}</span></div>
 
