@@ -24,7 +24,7 @@ module.exports = async function () {
   updateInstance();
 
 
-  inject('bf-friendsList', instancePrototype, 'render', (args, res) => {
+  inject('bf-friendslist', instancePrototype, 'render', (args, res) => {
     // const exists = [ ...document.querySelectorAll('header') ].find(a => a.innerHTML === 'Favorite Friends');
     const friends = [];
     for (const id of this.FAV_FRIENDS) {

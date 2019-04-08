@@ -42,6 +42,7 @@ module.exports = async function () {
 
   const INJECT_INTO = [
     {
+      id: 'message',
       className: '.pc-message',
       func (res, original) {
         const { message } = res.props;
@@ -50,6 +51,7 @@ module.exports = async function () {
       }
     },
     {
+      id: 'member',
       className: '.pc-member',
       func (res, original) {
         if (original.props.children) {
@@ -61,7 +63,7 @@ module.exports = async function () {
   ];
 
   for (const injection of INJECT_INTO) {
-    const { className, func } = injection;
+    const { id, className, func } = injection;
     await waitFor(className);
     const selector = document.querySelector(className);
     const updateInstance = () =>
@@ -69,7 +71,7 @@ module.exports = async function () {
     const instancePrototype = Object.getPrototypeOf(updateInstance());
     updateInstance();
 
-    inject(`bf-star-${className}`, instancePrototype, 'render', function (_, res) {
+    inject(`bf-star-${id}`, instancePrototype, 'render', function (_, res) {
       func(this, res);
       return res;
     });
