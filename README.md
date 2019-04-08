@@ -12,9 +12,9 @@ How are favorited friends different to normal friends you ask? Here is the curre
 * [Adds a little star emoji next to their name](https://massive-legend.nevulo.xyz/QhzivMAb.png)
 * [Entirely new section in the DMs area that will prioritize DMs from favorited friends](https://massive-legend.nevulo.xyz/f11PuwZH.png)
 * [See when and where your favorite friends were last active](https://massive-legend.nevulo.xyz/DOZPdrTn.mp4)
+* [Integration with `pc-spotify` to listen along with your friends if they're listening to Spotify](https://massive-legend.nevulo.xyz/tCO7Kn55.mp4)
+* [Special "Favorited" tab inside of the "Friends" section to see all of your favorited friends at once]https://massive-legend.nevulo.xyz/Lp76IzAp.png
 
 ... More features are planned, and will be coming in the future, such as:
-* the ability to see all of your favorited friends at once in the "Friends" tab (general mock-up [here](https://massive-legend.nevulo.xyz/b608ylVg.png))
-* Integration with `pc-spotify` to see what your friends are listening to
 * Special notification sounds for favorited friends
 * Big customization settings to allow you to change the names of any of your favorited friends
