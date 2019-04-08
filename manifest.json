@@ -4,5 +4,8 @@
   "description": "it makes it better you bogan",
   "author": "Nevulo#0007 & Squiggles",
   "license": "MIT",
-  "repo": "https://github.com/Nevvulo/betterfriends"
+  "repo": "https://github.com/Nevvulo/betterfriends",
+  "dependencies": [
+    "pc-spotify"
+  ]
 }
