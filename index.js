@@ -1,10 +1,7 @@
 const { Plugin } = require('powercord/entities');
-const { inject, uninject } = require('powercord/injector');
-const { waitFor, getOwnerInstance, sleep, createElement } = require('powercord/util');
-const { React, ReactDOM, getModule } = require('powercord/webpack');
-const { Toast } = require('powercord/components');
+const { uninject } = require('powercord/injector');
+const { React } = require('powercord/webpack');
 const { resolve } = require('path');
-const { StatusHandler, FriendChannel } = require('./components');
 const Settings = require('./Settings');
 
 
@@ -19,17 +16,8 @@ module.exports = class BetterFriends extends Plugin {
       statusStorage: {},
       lastMessageID: {}
     };
-    const MAXIMUM_STAR_RENDER = 500;
-    let STARS_RENDERED = [];
 
-    await waitFor('.pc-message');
-    await waitFor('.pc-username');
-    const getUser = getModule([ 'getUser' ]);
-    const { getStatus } = getModule([ 'getStatus' ]);
-
-    const showStars = true || this.settings.config.showStar;
-
-    // Register plugin in Settings menu
+    // Register settings menu for BetterFriends
     this.registerSettings(
       'betterfriends',
       'Better Friends',
@@ -42,263 +30,31 @@ module.exports = class BetterFriends extends Plugin {
     // Handle CSS
     this.loadCSS(resolve(__dirname, 'style.scss'));
 
-    const statuses = {
-      online: { friendly: 'online',
-        class: 'online-2S838R' },
-      idle: { friendly: 'idle',
-        class: 'idle-3DEnRT' },
-      dnd: { friendly: 'on do not disturb',
-        class: 'dnd-1_xrcq' },
-      offline: { friendly: 'offline',
-        class: 'offline-3qoTek' }
-    };
+    /*
+     * Modules
+     * Handled by the module resolver outside of `startPlugin`.
+     * All modules are created by Nevulo#0007 unless stated otherwise. Contributors will be listed as well
+     */
 
-    this.favoriteFriendsTab = async () => {
-      if (!document.querySelector('.pc-tabBar')) {
-        await waitFor('.pc-tabBar');
-      }
-      if (!document.querySelector('.friendsRow-2yicud')) {
-        await waitFor('.friendsRow-2yicud');
-      }
-      const TOP_BAR = document.querySelector('.pc-tabBar');
-      const { setSection } = getModule(t => t.setSection && Object.keys(t).length === 1);
-      const COMPONENTS = {
-        FRIEND_TABLE: getOwnerInstance(document.querySelector('.friendsTable-133bsv')),
-        FRIEND_TABLE_HEADER: getOwnerInstance(document.querySelector('.friendsTableHeader-32yE7d')),
-        FRIEND_ROW: getOwnerInstance(document.querySelector('.friendsRow-2yicud'))
-      };
-      TOP_BAR.classList.add('bf-friends-top-bar');
+    // Store each of the modules above into this object where we can load them later
+    this.MODULES = require('./modules');
+    for (const module of Object.keys(this.MODULES)) {
+      this.MODULES[module] = this.MODULES[module].bind(this);
+    }
+    this.log(this.MODULES);
 
-      const updateFavoriteFriendsTabInstance = () =>
-        (this.favoriteFriendsTabInstance = getOwnerInstance(TOP_BAR));
-      const instancePrototype = Object.getPrototypeOf(updateFavoriteFriendsTabInstance());
-      updateFavoriteFriendsTabInstance();
-
-      const populateFavoriteFriends = () => {
-        const originalRows = COMPONENTS.FRIEND_TABLE.state.rows;
-        if (!originalRows._rows) {
-          originalRows._rows = originalRows;
-        }
-        const rows = originalRows._rows.filter(n => this.FAV_FRIENDS.includes(n.key));
-
-        // instancePrototype.props.children[0].props.selectedItem = 'FAVORITED';
-        COMPONENTS.FRIEND_TABLE.setState({
-          rows,
-          section: () => true
-        });
-      };
-
-      const select = (e) => {
-        this.log('Favorited button clicked');
-        setSection('FAVORITED');
-        populateFavoriteFriends();
-        const { target } = e;
-        target.classList.add('itemSelected-1qLhcL', 'selected-3s45Ha', 'pc-itemSelected', 'pc-selected');
-      };
-
-      inject('bf-favorite-friends-tabbar', instancePrototype, 'render', (args, res) => {
-        if (res.props.children[0].props.selectedItem === 'FAVORITED') {
-          populateFavoriteFriends();
-        } else {
-          const elm = [ ...document.querySelectorAll('.itemSelected-1qLhcL.selected-3s45Ha') ].find(a => a.innerHTML === 'Favorited');
-          if (elm) {
-            elm.classList.remove('itemSelected-1qLhcL', 'selected-3s45Ha', 'pc-itemSelected', 'pc-selected');
-          }
-        }
-
-        const FAV_FRIENDS_BUTTON = React.createElement('div', {
-          id: 'FAVORITED',
-          selectedItem: res.props.children[0].props.selectedItem,
-          itemType: 'topPill-30KHOu',
-          className: 'itemDefault-3Jdr52 item-PXvHYJ notSelected-1N1G5p pc-itemDefault pc-item pc-notSelected item-3HpYcP pc-item',
-          onMouseDown: select
-        }, 'Favorited');
-
-        res.props.children.splice(3, 0, FAV_FRIENDS_BUTTON);
-        // Only inject in the first 'All' button
-        return res;
-      });
-    };
-
-    this.information = () => {
-      const mdl = getModule([ 'receiveMessage' ]);
-      inject('bf-message-listener', mdl, 'receiveMessage', (args, res) => {
-        const message = args[1];
-        if (message && this.FAV_FRIENDS.includes(message.author.id)) {
-          this.FRIEND_DATA.lastMessageID[message.author.id] = { id: message.id,
-            channel: message.channel_id };
-        }
-        return res;
-      });
-    };
-
-
-    this.star = async () => {
-      const createStar = async () => {
-        await waitFor('.pc-username');
-        STARS_RENDERED = STARS_RENDERED.sort((a, b) => a === b ? 0 : (a.compareDocumentPosition(b) & 2 ? 1 : -1));
-        for (let element of [ ...document.querySelectorAll('span.pc-username') ].filter(elm => this.FAV_FRIENDS.includes(elm.parentElement.parentElement.parentElement.parentElement.getAttribute('data-author-id')) && ![ ...elm.classList ].includes('bf-star')).sort((a, b) => a === b ? 0 : (a.compareDocumentPosition(b) & 2 ? 1 : -1))) {
-          STARS_RENDERED.push(element);
-          element = element.parentNode;
-          if (showStars && !element.querySelector('.bf-star')) {
-            const starElement = document.createElement('span');
-            starElement.classList.add('bf-star', 'bf-username');
-            element.appendChild(starElement);
-          }
-        }
-      };
-
-      const genericInjection = (res, id) => {
-        res.props['data-author-id'] = id;
-        if (this.FAV_FRIENDS.includes(id)) {
-          if (STARS_RENDERED.length > MAXIMUM_STAR_RENDER) {
-            for (const username of STARS_RENDERED) {
-              username.classList.remove('bf-star');
-              STARS_RENDERED = STARS_RENDERED.filter(item => item !== username);
-            }
-          }
-          createStar();
-        }
-      };
-
-      const INJECT_INTO = [
-        {
-          className: '.pc-message',
-          func (res, original) {
-            const { message } = res.props;
-            const { author } = message;
-            genericInjection(original, author.id);
-          }
-        },
-        {
-          className: '.pc-member',
-          func (res, original) {
-            if (original.props.children) {
-              const id = original.props.children.props.children[0].props.children.props.src.split('/')[4];
-              genericInjection(original, id);
-            }
-          }
-        }
-      ];
-
-      for (const injection of INJECT_INTO) {
-        const { className, func } = injection;
-        await waitFor(className);
-        const selector = document.querySelector(className);
-        const updateInstance = () =>
-          (this.instance = getOwnerInstance(selector));
-        const instancePrototype = Object.getPrototypeOf(updateInstance());
-        updateInstance();
-
-        inject(`bf-star-${className}`, instancePrototype, 'render', function (_, res) {
-          func(this, res);
-          return res;
-        });
-      }
-    };
-
-    this.statusPopup = () => {
-      inject('bf-user', getUser, 'getUser', (args, res) => {
-        if (res && this.FAV_FRIENDS.includes(res.id)) {
-          const status = getStatus(res.id);
-          const previous = this.FRIEND_DATA.statusStorage[res.id];
-          if (previous && status !== previous) {
-            this.log('Showing notification');
-            const container = createElement('div', { id: 'bf-friend-status-popup' });
-            document.body.appendChild(container);
-            const Notification = React.createElement(Toast, {
-              header: React.createElement(StatusHandler, { statuses,
-                status,
-                user: res }),
-              style: {
-                bottom: '25px',
-                right: '25px',
-                height: 'auto',
-                display: 'block',
-                padding: '20px'
-              },
-              buttons: []
-            });
-            // this.statusPopupInstance.forceUpdate();
-            const render = async () => {
-              const NotificationRenderer = ReactDOM.render(Notification, container);
-              if (Notification && NotificationRenderer) {
-                await sleep(3500);
-                NotificationRenderer.setState({ leaving: true });
-                await sleep(500);
-              }
-              container.remove();
-            };
-            render();
-
-            for (const friend of [ ...document.querySelectorAll('.pc-friendchannel') ]) {
-              if (friend.querySelector('.pc-inner').getAttribute('user') === res.username) {
-                const statusDiv = friend.querySelector('.pc-status');
-                statusDiv.classList.remove(statuses[previous].class);
-                statusDiv.classList.add(statuses[status].class);
-              }
-            }
-          }
-
-          this.FRIEND_DATA.statusStorage[res.id] = status;
-        }
-        return res;
-      });
-    };
-
-    this.friends = async () => {
-      if (!document.querySelector('.pc-privateChannels')) {
-        await waitFor('.pc-privateChannels');
-      }
-      const DIRECT_MESSAGES_HEADER = [ ...document.querySelectorAll('header') ].find(a => a.innerHTML === 'Direct Messages');
-      DIRECT_MESSAGES_HEADER.parentNode.classList.add('bf-friends-scroller');
-      const original = document.querySelector('.pc-privateChannels .pc-scrollerWrap .pc-scroller');
-      const injector = [ ...original.querySelectorAll('a') ].find(el => el.href === 'https://canary.discordapp.com/channels/@me').parentElement;
-
-      const updateInstance = () =>
-        (this.statusPopupInstance = getOwnerInstance(injector));
-      const instancePrototype = Object.getPrototypeOf(updateInstance());
-      updateInstance();
-
-
-      inject('bf-friendsList', instancePrototype, 'render', (args, res) => {
-        // const exists = [ ...document.querySelectorAll('header') ].find(a => a.innerHTML === 'Favorite Friends');
-        const friends = [];
-        for (const id of this.FAV_FRIENDS) {
-          const friend = getUser.getUser(id);
-          if (!this.FRIEND_DATA.statusStorage[friend.id]) {
-            this.FRIEND_DATA.statusStorage[friend.id] = getStatus(friend.id);
-          }
-          friends.push(React.createElement(FriendChannel, { user: friend,
-            status: this.FRIEND_DATA.statusStorage[friend.id] || 'offline',
-            statuses,
-            data: this }));
-        }
-
-        const FAV_FRIENDS_HEADER = React.createElement('header', { children: 'Favorite Friends' });
-        this.log('Injected into friends panel!');
-        if (res.props.children.props.to.pathname === '/channels/@me') {
-          return [ res, FAV_FRIENDS_HEADER, ...friends ];
-        }
-        return res;
-      });
-    };
-
-    // Load modules
-    this.MODULES = {
-      friends: this.friends,
-      statusPopup: this.statusPopup,
-      star: this.star,
-      information: this.information,
-      favoriteFriendsTab: this.favoriteFriendsTab
-    };
-
+    // Load the entire plugin + all modules
     this.load();
     // Unload all modules if this user has no favorite friends
     if (this.FAV_FRIENDS.length === 0) {
       this.unload();
     }
   }
+
+  /*
+   * Module Resolver + Handler
+   * Handles the loading and unloading of all modules.
+   */
 
   /**
    * Load one or multiple modules
@@ -310,7 +66,7 @@ module.exports = class BetterFriends extends Plugin {
       this[specific]();
     } else {
       for (const load of Object.keys(this.MODULES)) {
-        this[load]();
+        this.MODULES[load]();
       }
     }
   }
