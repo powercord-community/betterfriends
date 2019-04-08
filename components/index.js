@@ -5,4 +5,3 @@ require('fs')
     const moduleName = filename.split('.')[0];
     exports[moduleName] = require(`${__dirname}/${filename}`);
   });
-
