@@ -13,7 +13,7 @@ How are favorited friends different to normal friends you ask? Here is the curre
 * [Entirely new section in the DMs area that will prioritize DMs from favorited friends](https://massive-legend.nevulo.xyz/f11PuwZH.png)
 * [See when and where your favorite friends were last active](https://massive-legend.nevulo.xyz/DOZPdrTn.mp4)
 * [Integration with `pc-spotify` to listen along with your friends if they're listening to Spotify](https://massive-legend.nevulo.xyz/tCO7Kn55.mp4)
-* [Special "Favorited" tab inside of the "Friends" section to see all of your favorited friends at once]https://massive-legend.nevulo.xyz/Lp76IzAp.png
+* [Special "Favorited" tab inside of the "Friends" section to see all of your favorited friends at once](https://massive-legend.nevulo.xyz/Lp76IzAp.png)
 
 ... More features are planned, and will be coming in the future, such as:
 * Special notification sounds for favorited friends
