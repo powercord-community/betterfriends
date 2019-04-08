@@ -18,37 +18,41 @@ module.exports = class Settings extends React.Component {
   render () {
     return (
       <div>
-        {Object.keys(getRelationships()).map((em) => {
-          const user = getUser(em);
-          return (<button type="button" class={`bf-friends-container pc-grow pc-button ${this.state.favfriends.find(a => a === em) ? 'bf-friend-selected' : ''}`} onClick={(e) => {
-            let { target } = e;
-            const callNewTarget = () => {
-              target = target.parentNode;
+        {() => {
+          const relationships = getRelationships();
+          Object.keys(relationships.filter(relation => relationships[relation] === 1)).map((em) => {
+            const user = getUser(em);
+            return (<button type="button" class={`bf-friends-container pc-grow pc-button ${this.state.favfriends.find(a => a === em) ? 'bf-friend-selected' : ''}`} onClick={(e) => {
+              let { target } = e;
+              const callNewTarget = () => {
+                target = target.parentNode;
+                if (![ ...target.classList ].includes('bf-friends-container')) {
+                  callNewTarget();
+                }
+              };
               if (![ ...target.classList ].includes('bf-friends-container')) {
                 callNewTarget();
               }
-            };
-            if (![ ...target.classList ].includes('bf-friends-container')) {
-              callNewTarget();
-            }
 
-            if (![ ...target.classList ].includes('bf-friend-selected')) {
-              target.classList.add('bf-friend-selected');
-              this.state.favfriends.push(em);
-              this._set('favfriends', this.state.favfriends);
-            } else {
-              target.classList.remove('bf-friend-selected');
-              this._set('favfriends', this.state.favfriends.filter(a => a !== em));
-            }
-            this.plugin.reload('friends');
-          }}>
-            <div class='bf-friend-content'>
-              <img class='bf-friend' src={!user.avatar ? `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png` : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}></img>
-              <h1 class='bf-friend-name'>{user.username}</h1>
-              <h2 class='bf-friend-discrim'>{user.discriminator}</h2>
-            </div>
-          </button>);
-        })}
+              if (![ ...target.classList ].includes('bf-friend-selected')) {
+                target.classList.add('bf-friend-selected');
+                this.state.favfriends.push(em);
+                this._set('favfriends', this.state.favfriends);
+              } else {
+                target.classList.remove('bf-friend-selected');
+                this._set('favfriends', this.state.favfriends.filter(a => a !== em));
+              }
+              this.plugin.reload('friends');
+            }}>
+              <div class='bf-friend-content'>
+                <img class='bf-friend' src={!user.avatar ? `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png` : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}></img>
+                <h1 class='bf-friend-name'>{user.username}</h1>
+                <h2 class='bf-friend-discrim'>{user.discriminator}</h2>
+              </div>
+            </button>);
+          });
+        }
+        }
       </div>
     );
   }
