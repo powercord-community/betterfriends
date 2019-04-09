@@ -2,9 +2,7 @@ const { inject } = require('powercord/injector');
 const { Toast } = require('powercord/components');
 const { React, ReactDOM, getModule } = require('powercord/webpack');
 const { createElement, sleep } = require('powercord/util');
-const { getStatus } = getModule([ 'getStatus' ]);
 const { StatusHandler } = require('./../components');
-const getUser = getModule([ 'getUser' ]);
 
 const statuses = {
   online: { friendly: 'online',
@@ -23,6 +21,12 @@ const statuses = {
  * Contributors: aetheryx#0001
  */
 module.exports = async function () {
+  if (!this.settings.config.statuspopup) {
+    return;
+  }
+  const { getStatus } = await getModule([ 'getStatus' ]);
+  const getUser = await getModule([ 'getUser' ]);
+
   inject('bf-user', getUser, 'getUser', (args, res) => {
     if (res && this.FAV_FRIENDS.includes(res.id)) {
       const status = getStatus(res.id);
