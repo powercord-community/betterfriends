@@ -7,6 +7,7 @@ const InformationModal = require('./InformationModal');
 const { Tooltip } = require('powercord/components');
 const { Info } = require('powercord/components/Icons');
 const { Statuses } = require('./../Constants');
+const { config: { infomodal } } = powercord.pluginManager.get('betterfriends').settings;
 
 module.exports = class BetterFriendChannel extends React.Component {
   constructor ({ user, status, data }) {
@@ -62,10 +63,14 @@ module.exports = class BetterFriendChannel extends React.Component {
             <div class={`${Statuses[this.status].class} status-oxiHuE pc-${this.status} pc-status small-5Os1Bb pc-small status-2zcSVk pc-status status-1ibiUI pc-status`}></div>
           </div>
           <div class="nameWrapper-10v56U pc-nameWrapper"><span class="name-2WpE7M pc-name">{this.user.username}</span></div>
+          {() => {
+            if (infomodal) {
+              return <Info class="bf-information" onClick={this.informationClick}>
+                <Tooltip class="bf-information-tooltip" text='User Information' position='top'></Tooltip>
+              </Info>;
+            }
+          }}
 
-          <Info class="bf-information" onClick={this.informationClick}>
-            <Tooltip class="bf-information-tooltip" text='User Information' position='top'></Tooltip>
-          </Info>
         </a>
       </div>
     );
