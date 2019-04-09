@@ -10,7 +10,7 @@ const { isFriend, isFavoriteFriend } = require('./../Constants');
  * Contributors: Joakim#9814, Bowser65#0001
  */
 module.exports = async function () {
-  const UserContextMenu = getModuleByDisplayName('UserContextMenu');
+  const UserContextMenu = await getModuleByDisplayName('UserContextMenu');
   inject('bf-contextmenu-listener', UserContextMenu.prototype, 'render', (args, res) => {
     this.log(res);
     const id = res.props.children.props.children.props.children[0].props.children[0].props.userId;
