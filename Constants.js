@@ -32,5 +32,10 @@ module.exports = ({
     FavoriteFriendsSection: [ 'bf-favorite-friends-tabbar' ],
     InformationModal: [ 'bf-message-listener' ],
     StatusPopup: [ 'bf-user' ]
+  },
+  Sounds: {
+    message1: 'Message',
+    call_ringing: 'Incoming Call',
+    user_join: 'User Joining Voice Channel'
   }
 });
