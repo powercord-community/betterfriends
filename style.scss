@@ -33,24 +33,6 @@
    margin-top: 8px;
 }
 
-.bf-friends-container { 
-   background-color: #23272A;
-   border-radius: 3px;
-   padding-top: 4px;
-   padding-bottom: 4px;
-   margin: 6px;
-   z-index: 99;
-   display: inline-block;
-   cursor: pointer;
-   transition: all 0.15s ease;
-   &.bf-friend-selected {
-      transition: all 0.15s ease;
-      background-color: #43b581 !important;
-      box-shadow: 1px 1px 10px 1px;
-      transform: scale(32px);
-   }
-}
-
 .bf-star {
    margin-left: 4px;
    padding-left: 12px;
@@ -72,4 +54,32 @@
 
 .channel-2QD9_O:hover .bf-information {
    display: block;
+}
+
+.bf-user-settings {
+   width: auto !important;
+   margin-bottom: 32px;
+}
+
+.bf-friend-item {
+   padding: 6px;
+   padding-left: 18px;
+   margin-top: 4px;
+   margin-bottom: 4px;
+   height: auto;
+}
+
+.bf-notification-sounds {
+   width: auto !important;
+   padding-bottom: 64px;
+}
+
+.bf-notification-sounds-icon {
+   background: url('https://canary.discordapp.com/assets/f9b93aa0d9985bd2b678da58ed0d75d2.svg') 50% no-repeat !important;
+   width: auto;
+   height: auto;
+}
+
+.divider-3573oO.marginTop20-3TxNs6 {
+   display: none;
 }
