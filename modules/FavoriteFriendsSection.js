@@ -15,7 +15,7 @@ module.exports = async function () {
     await waitFor('.friendsRow-2yicud');
   }
   const TOP_BAR = document.querySelector('.pc-tabBar');
-  const { setSection } = getModule(t => t.setSection && Object.keys(t).length === 1);
+  const { setSection } = await getModule(t => t.setSection && Object.keys(t).length === 1);
   const COMPONENTS = {
     FRIEND_TABLE: getOwnerInstance(document.querySelector('.friendsTable-133bsv')),
     FRIEND_TABLE_HEADER: getOwnerInstance(document.querySelector('.friendsTableHeader-32yE7d')),

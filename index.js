@@ -42,7 +42,6 @@ module.exports = class BetterFriends extends Plugin {
     for (const module of Object.keys(this.MODULES)) {
       this.MODULES[module] = this.MODULES[module].bind(this);
     }
-    this.log(this.MODULES);
 
     // Load the entire plugin + all modules
     this.load();

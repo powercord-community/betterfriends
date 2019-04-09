@@ -1,15 +1,16 @@
 const { inject } = require('powercord/injector');
 const { React, getModule } = require('powercord/webpack');
 const { waitFor, getOwnerInstance } = require('powercord/util');
-const { getStatus } = getModule([ 'getStatus' ]);
 const { FriendChannel } = require('./../components');
-const getUser = getModule([ 'getUser' ]);
 
 /*
  * [ Friend DM Channel ]
  * Creates and populates the "Favorited Friends" section on the private channel/DMs screen
  */
 module.exports = async function () {
+  const { getStatus } = await getModule([ 'getStatus' ]);
+  const getUser = await getModule([ 'getUser' ]);
+
   if (!document.querySelector('.pc-privateChannels')) {
     await waitFor('.pc-privateChannels');
   }
