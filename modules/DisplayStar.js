@@ -1,8 +1,7 @@
 const { waitFor, getOwnerInstance } = require('powercord/util');
+const { React } = require('powercord/webpack');
 const { inject } = require('powercord/injector');
-
-const MAXIMUM_STAR_RENDER = 500;
-let STARS_RENDERED = [];
+const { Star } = require('./../components');
 
 /*
  * [ Display Star ]
@@ -15,31 +14,13 @@ module.exports = async function () {
   await waitFor('.pc-username');
   await waitFor('.pc-message');
 
-  const createStar = async () => {
-    await waitFor('.pc-username');
-    STARS_RENDERED = STARS_RENDERED.sort((a, b) => a === b ? 0 : (a.compareDocumentPosition(b) & 2 ? 1 : -1));
-    for (let element of [ ...document.querySelectorAll('span.pc-username') ].filter(elm => this.FAV_FRIENDS.includes(elm.parentElement.parentElement.parentElement.parentElement.getAttribute('data-author-id')) && ![ ...elm.classList ].includes('bf-star')).sort((a, b) => a === b ? 0 : (a.compareDocumentPosition(b) & 2 ? 1 : -1))) {
-      STARS_RENDERED.push(element);
-      element = element.parentNode;
-      if (!element.querySelector('.bf-star')) {
-        const starElement = document.createElement('span');
-        starElement.classList.add('bf-star', 'bf-username');
-        element.appendChild(starElement);
-      }
-    }
-  };
-
   const genericInjection = (res, id) => {
-    res.props['data-author-id'] = id;
     if (this.FAV_FRIENDS.includes(id)) {
-      if (STARS_RENDERED.length > MAXIMUM_STAR_RENDER) {
-        for (const username of STARS_RENDERED) {
-          username.classList.remove('bf-star');
-          STARS_RENDERED = STARS_RENDERED.filter(item => item !== username);
-        }
+      if (res.props.children && res.props.children[0] && res.props.children[0].props && res.props.children[0].props.children && res.props.children[0].props.children[0]) {
+        res.props.children[0].props.children[1].props.children.splice(1, 0, React.createElement(Star, { className: 'bf-star' }));
       }
-      createStar();
     }
+    return res;
   };
 
   const INJECT_INTO = [
@@ -49,7 +30,7 @@ module.exports = async function () {
       func (res, original) {
         const { message } = res.props;
         const { author } = message;
-        genericInjection(original, author.id);
+        return genericInjection(original, author.id);
       }
     },
     {
@@ -58,8 +39,9 @@ module.exports = async function () {
       func (res, original) {
         if (original.props.children) {
           const id = original.props.children.props.children[0].props.children.props.src.split('/')[4];
-          genericInjection(original, id);
+          return genericInjection(original, id);
         }
+        return original;
       }
     }
   ];
@@ -74,8 +56,7 @@ module.exports = async function () {
     updateInstance();
 
     inject(`bf-star-${id}`, instancePrototype, 'render', function (_, res) {
-      func(this, res);
-      return res;
+      return func(this, res);
     });
   }
 };
