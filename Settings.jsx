@@ -1,7 +1,8 @@
 const { React } = require('powercord/webpack');
+const { getOwnerInstance } = require('powercord/util');
 const { getModule, getModuleByDisplayName, getComponentByDisplayName } = require('powercord/webpack');
 const { getRelationships } = getModule([ 'getRelationships' ]);
-const { SwitchItem, TextInput, Category } = require('powercord/components/settings');
+const { SwitchItem, TextInput } = require('powercord/components/settings');
 const { getUser } = getModule([ 'getUser' ]);
 const { Sounds } = require('./Constants');
 const Text = getModuleByDisplayName('Text');
@@ -49,7 +50,19 @@ module.exports = class Settings extends React.Component {
           <PopoutListSearchBar
             autoFocus={true}
             placeholder='Search friends'
-            query=''
+            query={this.state.friendsQuery || ''}
+            onChange={function (e) {
+              console.log(this, e);
+              const main = document.querySelector('.bf-user-settings > .pc-flex > input');
+              console.log(main);
+              const element = getOwnerInstance(main);
+              const parent = getOwnerInstance(main.parentElement.parentElement);
+              console.log(element);
+              console.log(parent);
+
+              element.forceUpdate();
+              parent.forceUpdate();
+            }}
           />
           <PopoutListDivider/>
           <VerticalScroller
@@ -58,6 +71,7 @@ module.exports = class Settings extends React.Component {
             {Object.keys(relationships)
               .filter(relation => relationships[relation] === 1)
               .map(getUser)
+              .filter(user => this.state.friendsQuery ? user.username.includes(this.state.friendsQuery) : true)
               .map((user, i) =>
                 <SelectableItem className='bf-friend-item' id={user.id} key={i.toString()} selected={this.state.favfriends.includes(user.id)} onClick={(e) => {
                   if (!e.selected) {
@@ -126,46 +140,45 @@ module.exports = class Settings extends React.Component {
           Show status notifications
         </SwitchItem>
 
-        <Category
-          name='Notification Sounds'
-          description='Customize notification sounds specifically for favorited friends. You can put a link to an MP3 file in the textbox, or leave it blank to play the default sound'
-          opened={this.state.notifsoundsOpened}
-          onChange={() => this.setState({ notifsoundsOpened: !this.state.notifsoundsOpened })}
-        >
-          {Object.keys(Sounds)
-            .map((sound) =>
-              <div className='bf-notification-sounds'>
-                <div style={{ float: 'left' }}>
-                  <Text className='title-31JmR4 titleDefault-a8-ZSr medium-zmzTW- size16-14cGz5 height20-mO2eIN'>
-                    <label className='title-31JmR4 titleDefault-a8-ZSr medium-zmzTW- size16-14cGz5 height20-mO2eIN'>
-                      {Sounds[sound]}
-                    </label>
-                  </Text>
-                </div>
+        <h5 className='h5-18_1nd title-3sZWYQ size12-3R0845 height16-2Lv3qA weightSemiBold-NJexzi marginBottom8-AtZOdT marginTop40-i-78cZ'>
+          Notification Sounds
+        </h5>
+        <div className='description-3_Ncsb formText-3fs7AJ marginBottom20-32qID7 modeDefault-3a2Ph1 primary-jw0I4K'>
+          Customize notification sounds specifically for favorited friends. You can put a link to an MP3 file in the textbox, or leave it blank to play the default sound
+        </div>
+        {Object.keys(Sounds)
+          .map((sound) =>
+            <div className='bf-notification-sounds'>
+              <div style={{ float: 'left' }}>
+                <Text className='title-31JmR4 titleDefault-a8-ZSr medium-zmzTW- size16-14cGz5 height20-mO2eIN'>
+                  <label className='title-31JmR4 titleDefault-a8-ZSr medium-zmzTW- size16-14cGz5 height20-mO2eIN'>
+                    {Sounds[sound]}
+                  </label>
+                </Text>
+              </div>
 
-                <div style={{ float: 'right' }}>
-                  <div style={{ float: 'left' }}>
-                    <button onClick={() => playSound(sound)} className='bf-notification-sounds-icon button-1Pkqso iconButton-eOTKg4 button-38aScr lookOutlined-3sRXeN colorWhite-rEQuAQ buttonSize-2Pmk-w iconButtonSize-U9SCYe grow-q77ONN'></button>
-                  </div>
-                  <div style={{ float: 'right',
-                    paddingLeft: '16px' }}>
-                    <TextInput
-                      onChange={(value) => {
-                        this.state.notifsounds[sound] = { url: value,
-                          volume: 0.4 };
-                        this._set('notifsounds', this.state.notifsounds);
-                      }}
-                      className='bf-textarea-notifsounds'
-                      style={{ height: '33px' }}
-                      placeholder='Link to MP3 file'
-                      defaultValue={this.state.notifsounds[sound] ? this.state.notifsounds[sound].url : ''}
-                    />
-                  </div>
+              <div style={{ float: 'right' }}>
+                <div style={{ float: 'left' }}>
+                  <button onClick={() => playSound(sound)} className='bf-notification-sounds-icon button-1Pkqso iconButton-eOTKg4 button-38aScr lookOutlined-3sRXeN colorWhite-rEQuAQ buttonSize-2Pmk-w iconButtonSize-U9SCYe grow-q77ONN'></button>
+                </div>
+                <div style={{ float: 'right',
+                  paddingLeft: '16px' }}>
+                  <TextInput
+                    onChange={(value) => {
+                      this.state.notifsounds[sound] = { url: value,
+                        volume: 0.4 };
+                      this._set('notifsounds', this.state.notifsounds);
+                    }}
+                    className='bf-textarea-notifsounds'
+                    style={{ height: '33px' }}
+                    placeholder='Link to MP3 file'
+                    defaultValue={this.state.notifsounds[sound] ? this.state.notifsounds[sound].url : ''}
+                  />
                 </div>
               </div>
-            )
-          }
-        </Category>
+            </div>
+          )
+        }
       </div>
     );
   }
