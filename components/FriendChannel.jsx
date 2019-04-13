@@ -1,24 +1,25 @@
 const { React } = require('powercord/webpack');
 const { getModule } = require('powercord/webpack');
-const { getDMFromUserId } = getModule([ 'getDMFromUserId' ]);
 const { open: openModal } = require('powercord/modal');
-const { transitionTo } = getModule([ 'transitionTo' ]);
 const InformationModal = require('./InformationModal');
 const { Tooltip } = require('powercord/components');
 const { Info } = require('powercord/components/Icons');
 const { Statuses } = require('./../Constants');
+const { getDMFromUserId } = getModule([ 'getDMFromUserId' ]);
+const { openPrivateChannel } = getModule([ 'openPrivateChannel' ]);
+const { transitionTo } = getModule([ 'transitionTo' ]);
+const { getCurrentUser } = getModule([ 'getCurrentUser' ]);
+const { getStatus } = getModule([ 'getStatus' ]);
 const { config: { infomodal } } = powercord.pluginManager.get('betterfriends').settings;
 
 module.exports = class BetterFriendChannel extends React.Component {
-  constructor ({ user, status, data }) {
+  constructor ({ target }) {
     super();
-
-    this.user = user;
-    this.status = status;
-    this.data = data;
+    this.target = target;
 
     // bind this to button click event
     this.informationClick = this.informationClick.bind(this);
+    this.userClick = this.userClick.bind(this);
   }
 
   // no usage of "this", no need to bind
@@ -34,19 +35,22 @@ module.exports = class BetterFriendChannel extends React.Component {
       }
     };
     callNewTarget();
-
-    transitionTo(target.firstChild.getAttribute('href'));
-    for (const elm of [ ...document.querySelectorAll('.pc-friendchannel.pc-selected') ]) {
-      elm.classList.remove('selected-1HYmZZ', 'pc-selected');
+    if (!target.firstChild.getAttribute('href').includes('undefined')) {
+      transitionTo(target.firstChild.getAttribute('href'));
+    } else {
+      const user = getCurrentUser();
+      console.log(user);
+      openPrivateChannel(user.id, this.target.id);
     }
-    target.classList.add('selected-1HYmZZ', 'pc-selected');
+
+    setTimeout(() => target.classList.add('selected-1HYmZZ', 'pc-selected'), 2);
   }
 
   informationClick (e) {
     e.preventDefault();
-    const info = this.data.FRIEND_DATA.lastMessageID[this.user.id];
+    const info = this.data.FRIEND_DATA.lastMessageID[this.target.id];
     openModal(() => React.createElement(InformationModal, {
-      user: this.user,
+      user: this.target,
       channel: !info ? 'nothing' : info.channel,
       message: !info ? 'nothing' : info.id
     }));
@@ -54,25 +58,42 @@ module.exports = class BetterFriendChannel extends React.Component {
   }
 
   render () {
-    return (
-      <div class="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
-        opacity: 1 }}>
-        <a href={`/channels/@me/${getDMFromUserId(this.user.id)}`} onClick={this.userClick}>
-          <div class="wrapper-2F3Zv8 pc-wrapper small-5Os1Bb pc-small forceDarkTheme-2cI4Hb pc-forceDarkTheme avatar-28BJzY pc-avatar avatarSmall-3ACRaI">
-            <div user={this.user.username} status={this.status} class="inner-1W0Bkn pc-inner stop-animation" style={{ backgroundImage: `url(${this.user.avatarURL})` }}></div>
-            <div class={`${Statuses[this.status].class} status-oxiHuE pc-${this.status} pc-status small-5Os1Bb pc-small status-2zcSVk pc-status status-1ibiUI pc-status`}></div>
-          </div>
-          <div class="nameWrapper-10v56U pc-nameWrapper"><span class="name-2WpE7M pc-name">{this.user.username}</span></div>
-          {() => {
-            if (infomodal) {
-              return <Info class="bf-information" onClick={this.informationClick}>
-                <Tooltip class="bf-information-tooltip" text='User Information' position='top'></Tooltip>
-              </Info>;
-            }
-          }}
+    return (() => {
+      console.log(this.target);
+      // This ain't a user, son! This is just a generic channel with a name and SVG avatar.
+      if (!this.target.id) {
+        return (<div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
+          opacity: 1 }}>
+          <a href={this.target.href} onClick={this.userClick}>
+            <svg name={this.target.username} className='linkButtonIcon-Mlm5d6' width={this.target.width || '24'} height={this.target.height || '24'} viewBox='0 0 24 24'>
+              <g fill='none' fill-rule='evenodd'>
+                <path fill='currentColor' d={this.target.avatar}></path>
+                <rect width='24' height='24'></rect>
+              </g>
+            </svg>
+            <div className="name-2WpE7M pc-name">{this.target.username}</div>
+          </a>
+        </div>);
+      }
 
-        </a>
-      </div>
-    );
+      return ((() => {
+        const status = getStatus(this.target.id);
+        return (<div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
+          opacity: 1 }}>
+          <a href={`/channels/@me/${getDMFromUserId(this.target.id)}`} onClick={this.userClick}>
+            <div className="wrapper-2F3Zv8 pc-wrapper small-5Os1Bb pc-small forceDarkTheme-2cI4Hb pc-forceDarkTheme avatar-28BJzY pc-avatar avatarSmall-3ACRaI">
+              <div user={this.target.username} status={status} className="inner-1W0Bkn pc-inner stop-animation" style={{ backgroundImage: `url(${this.target.avatarURL})` }}></div>
+              <div className={`${Statuses[status].class} status-oxiHuE pc-${status} pc-status small-5Os1Bb pc-small status-2zcSVk pc-status status-1ibiUI pc-status`}></div>
+            </div>
+            <div className="nameWrapper-10v56U"><span className="name-2WpE7M">{this.target.username}</span></div>
+            {() => {
+              if (infomodal) {
+                return <Tooltip className="bf-information-tooltip" text='User Information' position='top'><Info className="bf-information" onClick={this.informationClick} /></Tooltip>;
+              }
+            }}
+          </a>
+        </div>);
+      })());
+    })();
   }
 };
