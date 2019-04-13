@@ -39,8 +39,11 @@ module.exports = class BetterFriendChannel extends React.Component {
       transitionTo(target.firstChild.getAttribute('href'));
     } else {
       const user = getCurrentUser();
-      console.log(user);
       openPrivateChannel(user.id, this.target.id);
+    }
+
+    for (const elm of [ ...document.querySelectorAll('.selected-1HYmZZ') ]) {
+      elm.classList.remove('selected-1HYmZZ', 'pc-selected');
     }
 
     setTimeout(() => target.classList.add('selected-1HYmZZ', 'pc-selected'), 2);
@@ -59,7 +62,20 @@ module.exports = class BetterFriendChannel extends React.Component {
 
   render () {
     return (() => {
-      console.log(this.target);
+      if (this.target.icon) {
+        return ((() => (
+          <div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
+            opacity: 1 }}>
+            <a href={`/channels/@me/${this.target.id}`} onClick={this.userClick}>
+              <div className="wrapper-2F3Zv8 pc-wrapper small-5Os1Bb pc-small forceDarkTheme-2cI4Hb pc-forceDarkTheme avatar-28BJzY pc-avatar avatarSmall-3ACRaI">
+                <div className="inner-1W0Bkn pc-inner stop-animation" style={{ backgroundImage: `url("https://cdn.discordapp.com/channel-icons/${this.target.id}/${this.target.icon}")` }}></div>
+              </div>
+              <div className="nameWrapper-10v56U"><span className="name-2WpE7M">{this.target.name}</span></div>
+            </a>
+          </div>
+        ))());
+      }
+
       // This ain't a user, son! This is just a generic channel with a name and SVG avatar.
       if (!this.target.id) {
         return (<div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
@@ -71,7 +87,7 @@ module.exports = class BetterFriendChannel extends React.Component {
                 <rect width='24' height='24'></rect>
               </g>
             </svg>
-            <div className="name-2WpE7M pc-name">{this.target.username}</div>
+            <div className="name-2WpE7M pc-name">{this.target.name}</div>
           </a>
         </div>);
       }
