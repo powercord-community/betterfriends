@@ -34,9 +34,9 @@
 }
 
 .bf-star {
+   display: inline;
    margin-left: 4px;
    padding-left: 12px;
-   height: 12px;
    background: url('https://canary.discordapp.com/assets/e4d52f4d69d7bba67e5fd70ffe26b70d.svg') 50% no-repeat;
    background-size: 9px 9px;
 }
@@ -82,4 +82,24 @@
 
 .divider-3573oO.marginTop20-3TxNs6 {
    display: none;
+}
+
+.bf-header-privatechannels {
+   color: #fff;
+   cursor: default;
+   display: block;
+   font-size: 12px;
+   font-weight: 500;
+   margin-top: 12px;
+   opacity: .3;
+   overflow: hidden;
+   padding: 9px 20px;
+   text-overflow: ellipsis;
+   text-transform: uppercase;
+   transition: opacity .15s ease;
+   white-space: nowrap;
+}
+
+.searchBar-2_Yu-C {
+   width: 100%;
 }
