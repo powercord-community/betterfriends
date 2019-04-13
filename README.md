@@ -2,7 +2,8 @@
 Powercord plugin that aims to improve Discord's friend feature
 
 # This plugin is a WIP
-Some features are not working correctly at all, or will change in the future. If you have found a bug, feel free to report it on the issues tab.
+Although fairly stable and despite the fact that *most* modules are functional, some features may not be working as intended, or will change in the future.
+If you have found a bug, feel free to report it on the issues tab.
 
 ### So, what does this do?
 Glad you asked. Essentially, this plugin allows you to *favorite* friends. 
@@ -14,7 +15,8 @@ How are favorited friends different to normal friends you ask? Here is the curre
 * [See when and where your favorite friends were last active](https://massive-legend.nevulo.xyz/DOZPdrTn.mp4)
 * [Integration with `pc-spotify` to listen along with your friends if they're listening to Spotify](https://massive-legend.nevulo.xyz/tCO7Kn55.mp4)
 * [Special "Favorited" tab inside of the "Friends" section to see all of your favorited friends at once](https://massive-legend.nevulo.xyz/Lp76IzAp.png)
+* Special notification sounds for favorited friends
 
 ... More features are planned, and will be coming in the future, such as:
-* Special notification sounds for favorited friends
+
 * Big customization settings to allow you to change the names of any of your favorited friends
