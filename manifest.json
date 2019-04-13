@@ -1,11 +1,10 @@
 {
   "name": "Better Friends",
-  "version": "1.0.0",
-  "description": "it makes it better you bogan",
-  "author": "Nevulo#0007 & Squiggles",
+  "version": "3.1.5",
+  "description": "Improves Discord's friend feature in a multitude of ways",
+  "author": "Nevulo#0007",
   "license": "MIT",
-  "repo": "https://github.com/Nevvulo/betterfriends",
-  "dependencies": [
+  "optionalDependencies": [
     "pc-spotify"
   ]
 }
