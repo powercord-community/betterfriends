@@ -81,7 +81,7 @@ module.exports = class BetterFriendChannel extends React.Component {
         return (<div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
           opacity: 1 }}>
           <a href={this.target.href} onClick={this.userClick}>
-            <svg name={this.target.username} className='linkButtonIcon-Mlm5d6' width={this.target.width || '24'} height={this.target.height || '24'} viewBox='0 0 24 24'>
+            <svg name={this.target.username} className='linkButtonIcon-Mlm5d6' width={this.target.width || '24'} height={this.target.height || '24'} viewBox={this.target.viewBox || '0 0 24 24'}>
               <g fill='none' fill-rule='evenodd'>
                 <path fill='currentColor' d={this.target.avatar}></path>
                 <rect width='24' height='24'></rect>
