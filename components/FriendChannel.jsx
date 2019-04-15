@@ -10,7 +10,8 @@ const { openPrivateChannel } = getModule([ 'openPrivateChannel' ]);
 const { transitionTo } = getModule([ 'transitionTo' ]);
 const { getCurrentUser } = getModule([ 'getCurrentUser' ]);
 const { getStatus } = getModule([ 'getStatus' ]);
-const { config: { infomodal } } = powercord.pluginManager.get('betterfriends').settings;
+const Plugin = powercord.pluginManager.get('betterfriends');
+const { config: { infomodal } } = Plugin.settings;
 
 module.exports = class BetterFriendChannel extends React.Component {
   constructor ({ target }) {
@@ -51,7 +52,7 @@ module.exports = class BetterFriendChannel extends React.Component {
 
   informationClick (e) {
     e.preventDefault();
-    const info = this.data.FRIEND_DATA.lastMessageID[this.target.id];
+    const info = Plugin.FRIEND_DATA.lastMessageID[this.target.id];
     openModal(() => React.createElement(InformationModal, {
       user: this.target,
       channel: !info ? 'nothing' : info.channel,
@@ -62,6 +63,7 @@ module.exports = class BetterFriendChannel extends React.Component {
 
   render () {
     return (() => {
+      // Group DM
       if (this.target.icon) {
         return ((() => (
           <div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
@@ -71,6 +73,7 @@ module.exports = class BetterFriendChannel extends React.Component {
                 <div className="inner-1W0Bkn pc-inner stop-animation" style={{ backgroundImage: `url("https://cdn.discordapp.com/channel-icons/${this.target.id}/${this.target.icon}")` }}></div>
               </div>
               <div className="nameWrapper-10v56U"><span className="name-2WpE7M">{this.target.name}</span></div>
+              <button className='close-3hZ5Ni'></button>
             </a>
           </div>
         ))());
@@ -102,11 +105,8 @@ module.exports = class BetterFriendChannel extends React.Component {
               <div className={`${Statuses[status].class} status-oxiHuE pc-${status} pc-status small-5Os1Bb pc-small status-2zcSVk pc-status status-1ibiUI pc-status`}></div>
             </div>
             <div className="nameWrapper-10v56U"><span className="name-2WpE7M">{this.target.username}</span></div>
-            {() => {
-              if (infomodal) {
-                return <Tooltip className="bf-information-tooltip" text='User Information' position='top'><Info className="bf-information" onClick={this.informationClick} /></Tooltip>;
-              }
-            }}
+            {Plugin.FAV_FRIENDS.includes(this.target.id) && infomodal && <Tooltip className="bf-information-tooltip" text='User Information' position='top'><Info className="bf-information" onClick={this.informationClick} /></Tooltip>}
+            {!Plugin.FAV_FRIENDS.includes(this.target.id) && <button className='close-3hZ5Ni'></button>}
           </a>
         </div>);
       })());

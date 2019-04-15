@@ -1,10 +1,10 @@
 const { React } = require('powercord/webpack');
-const { getModule, getModuleByDisplayName } = require('powercord/webpack');
+const { getModule, getModuleByDisplayName, getComponentByDisplayName } = require('powercord/webpack');
 const { getUser } = getModule([ 'getUser' ]);
 const { getChannel } = getModule([ 'getChannel' ]);
 const { getPrivateChannelIds } = getModule([ 'getPrivateChannelIds' ]);
 const FriendChannel = require('./FriendChannel');
-const SearchBar = getModuleByDisplayName('SearchBar');
+const SearchBar = getComponentByDisplayName('SearchBar');
 const VerticalScroller = getModuleByDisplayName('VerticalScroller');
 
 module.exports = class BetterFriendsDirectMessagesList extends React.Component {
@@ -59,7 +59,11 @@ module.exports = class BetterFriendsDirectMessagesList extends React.Component {
                 children: 'Direct Messages' }),
               ...([ ...new Set(getPrivateChannelIds()) ].map(a => {
                 const channel = getChannel(a);
-                return React.createElement(FriendChannel, { target: channel.recipients.length > 1 ? channel : getUser(channel.recipients[0]) });
+                const target = channel.recipients.length > 1 ? channel : getUser(channel.recipients[0]);
+                if (this.FAV_FRIENDS.includes(target.id)) {
+                  return;
+                }
+                return React.createElement(FriendChannel, { target });
               }))
             ];
             return channels;
