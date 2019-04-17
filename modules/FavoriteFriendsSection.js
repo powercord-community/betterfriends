@@ -1,5 +1,5 @@
-const { waitFor, getOwnerInstance } = require('powercord/util');
-const { React, getModule } = require('powercord/webpack');
+const { waitFor, getOwnerInstance, sleep } = require('powercord/util');
+const { React } = require('powercord/webpack');
 const { inject } = require('powercord/injector');
 
 /*
@@ -8,6 +8,7 @@ const { inject } = require('powercord/injector');
  * Contributors: aetheryx#0001
  */
 module.exports = async function () {
+  let ALL_FRIENDS = [];
   if (!document.querySelector('.pc-tabBar')) {
     await waitFor('.pc-tabBar');
   }
@@ -15,7 +16,6 @@ module.exports = async function () {
     await waitFor('.friendsRow-2yicud');
   }
   const TOP_BAR = document.querySelector('.pc-tabBar');
-  const { setSection } = await getModule(t => t.setSection && Object.keys(t).length === 1);
   const COMPONENTS = {
     FRIEND_TABLE: getOwnerInstance(document.querySelector('.friendsTable-133bsv')),
     FRIEND_TABLE_HEADER: getOwnerInstance(document.querySelector('.friendsTableHeader-32yE7d')),
@@ -33,38 +33,62 @@ module.exports = async function () {
     if (!originalRows._rows) {
       originalRows._rows = originalRows;
     }
-    const rows = originalRows._rows.filter(n => this.FAV_FRIENDS.includes(n.key));
-
-    // instancePrototype.props.children[0].props.selectedItem = 'FAVORITED';
-    COMPONENTS.FRIEND_TABLE.setState({
-      rows,
-      section: () => true
-    });
+    if (!ALL_FRIENDS.length) {
+      ALL_FRIENDS = originalRows._rows;
+    }
+    originalRows._rows = originalRows._rows.filter(n => this.FAV_FRIENDS.includes(n.key));
+    COMPONENTS.FRIEND_TABLE.state.section = () => true;
   };
 
-  const select = (e) => {
-    this.log('Favorited button clicked');
-    setSection('FAVORITED');
-    populateFavoriteFriends();
+  const populateNormalFriends = () => {
+    if (ALL_FRIENDS.length) {
+      COMPONENTS.FRIEND_TABLE.state.rows._rows = ALL_FRIENDS;
+    }
+  };
+
+  const select = async (e) => {
     const { target } = e;
-    target.classList.add('itemSelected-1qLhcL', 'selected-3s45Ha', 'pc-itemSelected', 'pc-selected');
+    target.classList.add('itemSelected-1qLhcL', 'selected-3s45Ha');
+    await sleep(4);
+    this.log('Favorited button clicked');
+    populateFavoriteFriends();
+    COMPONENTS.FRIEND_TABLE.forceUpdate();
+    COMPONENTS.FRIEND_TABLE.render();
   };
+
+  inject('bf-favorite-friends-tabbar-mount', instancePrototype, 'componentDidMount', () => {
+    this.log('Tab bar mounted');
+  });
+
+  inject('a', COMPONENTS.FRIEND_TABLE, 'render', (a, res) => {
+    console.log(res);
+    if (res.props.children[0].props.children.props.selectedItem.toString() === '() => true') {
+      res.props.children[1].props.children[1].props.children = ALL_FRIENDS
+        .filter(n => this.FAV_FRIENDS.includes(n.key))
+        .map(a => React.createElement(res.props.children[1].props.children[1].props.children[0].type || 'div', a));
+      this.log('Populating friends list');
+    } else {
+      populateNormalFriends();
+    }
+    return res;
+  });
 
   inject('bf-favorite-friends-tabbar', instancePrototype, 'render', (args, res) => {
-    if (res.props.children[0].props.selectedItem === 'FAVORITED') {
+    this.log('Tab bar rendered');
+    this.log(`Current selected item is ${res.props.children[0].props.selectedItem}`);
+    if (res.props.children[0].props.selectedItem.toString() === '() => true') {
       populateFavoriteFriends();
+      this.log('Re-rendered friend table');
     } else {
-      const elm = [ ...document.querySelectorAll('.itemSelected-1qLhcL.selected-3s45Ha') ].find(a => a.innerHTML === 'Favorited');
-      if (elm) {
-        elm.classList.remove('itemSelected-1qLhcL', 'selected-3s45Ha', 'pc-itemSelected', 'pc-selected');
-      }
+      populateNormalFriends();
     }
+    COMPONENTS.FRIEND_TABLE.render();
 
     const FAV_FRIENDS_BUTTON = React.createElement('div', {
       id: 'FAVORITED',
       selectedItem: res.props.children[0].props.selectedItem,
       itemType: 'topPill-30KHOu',
-      className: 'itemDefault-3Jdr52 item-PXvHYJ notSelected-1N1G5p pc-itemDefault pc-item pc-notSelected item-3HpYcP pc-item',
+      className: 'itemDefault-3Jdr52 item-PXvHYJ item-3HpYcP',
       onMouseDown: select
     }, 'Favorited');
 
@@ -74,4 +98,5 @@ module.exports = async function () {
     }
     return res;
   });
+  this.favoriteFriendsTabInstance.componentDidMount();
 };
