@@ -25,6 +25,7 @@ module.exports = async function () {
     return;
   }
   const { getStatus } = await getModule([ 'getStatus' ]);
+  const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
   const getUser = await getModule([ 'getUser' ]);
 
   inject('bf-user', getUser, 'getUser', (args, res) => {
@@ -61,8 +62,8 @@ module.exports = async function () {
         };
         render();
 
-        for (const friend of [ ...document.querySelectorAll('.pc-friendchannel') ]) {
-          if (friend.querySelector('.pc-inner').getAttribute('user') === res.username) {
+        for (const friend of [ ...document.querySelectorAll('.channel-2QD9_O') ]) {
+          if (friend.firstChild.href.includes(getDMFromUserId(res.id))) {
             const statusDiv = friend.querySelector('.pc-status');
             statusDiv.classList.remove(statuses[previous].class);
             statusDiv.classList.add(statuses[status].class);
