@@ -24,6 +24,7 @@ module.exports = class Settings extends React.Component {
     this.plugin = powercord.pluginManager.get('betterfriends');
 
     this.state = {
+      friendsQuery: '',
       favfriends: get('favfriends', []),
       notifsounds: get('notifsounds', {}),
       infomodal: get('infomodal', true),
@@ -51,18 +52,8 @@ module.exports = class Settings extends React.Component {
             autoFocus={true}
             placeholder='Search friends'
             query={this.state.friendsQuery || ''}
-            onChange={function (e) {
-              console.log(this, e);
-              const main = document.querySelector('.bf-user-settings > .pc-flex > input');
-              console.log(main);
-              const element = getOwnerInstance(main);
-              const parent = getOwnerInstance(main.parentElement.parentElement);
-              console.log(element);
-              console.log(parent);
-
-              element.forceUpdate();
-              parent.forceUpdate();
-            }}
+            onChange={(e) => this.setState({ friendsQuery: e })}
+            onClear={() => this.setState({ friendsQuery: '' })}
           />
           <PopoutListDivider/>
           <VerticalScroller
