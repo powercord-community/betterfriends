@@ -28,7 +28,7 @@ module.exports = ({
   InjectionIDs: {
     ContextMenu: [ 'bf-contextmenu-listener' ],
     DisplayStar: [ 'bf-star-member', 'bf-star-message' ],
-    FavoriteFriendChannel: [ 'bf-friendslist' ],
+    FavoriteFriendChannel: [ 'bf-direct-messages', 'bf-direct-messages-mount' ],
     FavoriteFriendsSection: [ 'bf-favorite-friends-tabbar' ],
     InformationModal: [ 'bf-message-listener' ],
     StatusPopup: [ 'bf-user' ]

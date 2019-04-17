@@ -37,7 +37,7 @@ module.exports = async function () {
       id: 'member',
       className: '.pc-member',
       func (res, original) {
-        if (original.props.children) {
+        if (original.props.children && original.props.children.props && original.props.children.props.children[0]) {
           const id = original.props.children.props.children[0].props.children.props.src.split('/')[4];
           return genericInjection(original, id);
         }
