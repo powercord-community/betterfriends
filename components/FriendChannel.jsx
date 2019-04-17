@@ -8,6 +8,7 @@ const { Statuses } = require('./../Constants');
 const { getDMFromUserId } = getModule([ 'getDMFromUserId' ]);
 const { openPrivateChannel } = getModule([ 'openPrivateChannel' ]);
 const { transitionTo } = getModule([ 'transitionTo' ]);
+const { getRelationships } = getModule([ 'getRelationships' ]);
 const { getCurrentUser } = getModule([ 'getCurrentUser' ]);
 const { getStatus } = getModule([ 'getStatus' ]);
 const Plugin = powercord.pluginManager.get('betterfriends');
@@ -30,24 +31,24 @@ module.exports = class BetterFriendChannel extends React.Component {
 
     let { target } = e;
     const callNewTarget = () => {
-      target = target.parentNode;
-      if (![ ...target.classList ].includes('pc-channel')) {
+      target = target.parentElement;
+      if (![ ...target.classList ].includes('channel-2QD9_O')) {
         callNewTarget();
       }
     };
     callNewTarget();
+    for (const elm of [ ...document.querySelectorAll('.selected-1HYmZZ') ]) {
+      elm.classList.remove('selected-1HYmZZ');
+      target.classList.add('selected-1HYmZZ');
+    }
+
     if (!target.firstChild.getAttribute('href').includes('undefined')) {
       transitionTo(target.firstChild.getAttribute('href'));
     } else {
       const user = getCurrentUser();
       openPrivateChannel(user.id, this.target.id);
     }
-
-    for (const elm of [ ...document.querySelectorAll('.selected-1HYmZZ') ]) {
-      elm.classList.remove('selected-1HYmZZ', 'pc-selected');
-    }
-
-    setTimeout(() => target.classList.add('selected-1HYmZZ', 'pc-selected'), 2);
+    target.classList.add('selected-1HYmZZ');
   }
 
   informationClick (e) {
@@ -84,20 +85,29 @@ module.exports = class BetterFriendChannel extends React.Component {
         return (<div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
           opacity: 1 }}>
           <a href={this.target.href} onClick={this.userClick}>
-            <svg name={this.target.username} className='linkButtonIcon-Mlm5d6' width={this.target.width || '24'} height={this.target.height || '24'} viewBox={this.target.viewBox || '0 0 24 24'}>
+            <svg name={this.target.name} className='linkButtonIcon-Mlm5d6' width={this.target.width || '24'} height={this.target.height || '24'} viewBox={this.target.viewBox || '0 0 24 24'}>
               <g fill='none' fill-rule='evenodd'>
                 <path fill='currentColor' d={this.target.avatar}></path>
                 <rect width='24' height='24'></rect>
               </g>
             </svg>
             <div className="name-2WpE7M pc-name">{this.target.name}</div>
+            {(() => {
+              if (this.target.name === 'Friends') {
+                const rel = getRelationships();
+                const pending = Object.keys(rel).filter(r => rel[r] === 3);
+                if (pending.length) {
+                  return (<div className="wrapper-232cHJ pc-wrapper">{pending.length}</div>);
+                }
+              }
+            })()}
           </a>
         </div>);
       }
 
       return ((() => {
         const status = getStatus(this.target.id);
-        return (<div className="channel-2QD9_O pc-channel pc-friendchannel" style={{ height: '42px',
+        return (<div className="channel-2QD9_O pc-channel pc-friendchannel bf-channel" style={{ height: '42px',
           opacity: 1 }}>
           <a href={`/channels/@me/${getDMFromUserId(this.target.id)}`} onClick={this.userClick}>
             <div className="wrapper-2F3Zv8 pc-wrapper small-5Os1Bb pc-small forceDarkTheme-2cI4Hb pc-forceDarkTheme avatar-28BJzY pc-avatar avatarSmall-3ACRaI">

@@ -52,8 +52,10 @@ module.exports = class BetterFriendsDirectMessagesList extends React.Component {
               React.createElement('div', { style: { width: '100%',
                 height: '20px' } }),
               ...(PSUEDO_CHANNELS.map(a => React.createElement(FriendChannel, { target: a }))),
-              React.createElement('header', { className: 'bf-header-privatechannels',
-                children: 'Favorite Friends' }),
+              this.FAV_FRIENDS.length
+                ? React.createElement('header', { className: 'bf-header-privatechannels',
+                  children: 'Favorite Friends' })
+                : null,
               ...(this.FAV_FRIENDS.map(a => React.createElement(FriendChannel, { target: getUser(a) }))),
               React.createElement('header', { className: 'bf-header-privatechannels',
                 children: 'Direct Messages' }),
