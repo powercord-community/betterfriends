@@ -1,7 +1,14 @@
 const { React } = require('powercord/webpack');
-const { getModule, getModuleByDisplayName, getComponentByDisplayName } = require('powercord/webpack');
+const {
+  getModule,
+  getModuleByDisplayName,
+  getComponentByDisplayName,
+  constants: { API_HOST },
+  channels: { getChannelId }
+} = require('powercord/webpack');
 const { getUser } = getModule([ 'getUser' ]);
 const { getChannel } = getModule([ 'getChannel' ]);
+const { getDMFromUserId } = getModule([ 'getDMFromUserId' ]);
 const { getPrivateChannelIds } = getModule([ 'getPrivateChannelIds' ]);
 const FriendChannel = require('./FriendChannel');
 const SearchBar = getComponentByDisplayName('SearchBar');
@@ -48,23 +55,47 @@ module.exports = class BetterFriendsDirectMessagesList extends React.Component {
               }
             ];
 
+            const determineIfSelected = (id) => {
+              const BASE_URI = `https://${API_HOST}`;
+              const HREFS = [ '/activity', '/library', '/store', '/channels/@me' ];
+              // If the ID is one of the links above, it means the user has selected a special channel such as "Activity"
+              if (HREFS.includes(id)) {
+                return document.location.href === `${BASE_URI}${id}`;
+              }
+              return document.location.href.includes(id);
+            };
+
             const channels = [
               React.createElement('div', { style: { width: '100%',
                 height: '20px' } }),
-              ...(PSUEDO_CHANNELS.map(a => React.createElement(FriendChannel, { target: a }))),
+              ...(PSUEDO_CHANNELS.map(target => {
+                target.selected = determineIfSelected(target.href);
+                return React.createElement(FriendChannel, { target });
+              })),
               this.FAV_FRIENDS.length
                 ? React.createElement('header', { className: 'bf-header-privatechannels',
                   children: 'Favorite Friends' })
                 : null,
-              ...(this.FAV_FRIENDS.map(a => React.createElement(FriendChannel, { target: getUser(a) }))),
+              ...(this.FAV_FRIENDS.map(user => {
+                const target = getUser(user);
+                target.selected = determineIfSelected(getDMFromUserId(target.id));
+                return React.createElement(FriendChannel, { target });
+              })),
               React.createElement('header', { className: 'bf-header-privatechannels',
                 children: 'Direct Messages' }),
               ...([ ...new Set(getPrivateChannelIds()) ].map(a => {
                 const channel = getChannel(a);
-                const target = channel.recipients.length > 1 ? channel : getUser(channel.recipients[0]);
+                let target = channel;
+                if (channel.type === 1) {
+                  target = getUser(channel.recipients[0]);
+                } else if (channel.type === 3 && !channel.name) {
+                  target.name = channel.recipients.map(getUser).map(user => user.username).join(', ');
+                }
+
                 if (this.FAV_FRIENDS.includes(target.id)) {
                   return;
                 }
+                target.selected = determineIfSelected(channel.id);
                 return React.createElement(FriendChannel, { target });
               }))
             ];
