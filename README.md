@@ -1,9 +1,14 @@
-# Better Friends [WIP]
+# Better Friends
 Powercord plugin that aims to improve Discord's friend feature
 
-# This plugin is a WIP
+## This plugin is a work in progress
 Although fairly stable and despite the fact that *most* modules are functional, some features may not be working as intended, or will change in the future.
 If you have found a bug, feel free to report it on the issues tab.
+
+## Installation
+Provided you have installed and injected Powercord correctly (see [here](https://github.com/powercord-org/powercord/wiki/Installation) for instructions)
+`1.` Clone the repo into your Powercord plugins folder (found in `powercord/src/Powercord/plugins`)
+`2.` CTRL+R in your canary client to restart.
 
 ### So, what does this do?
 Glad you asked. Essentially, this plugin allows you to *favorite* friends. 
