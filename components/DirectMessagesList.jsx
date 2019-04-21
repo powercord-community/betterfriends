@@ -24,7 +24,7 @@ module.exports = class BetterFriendsDirectMessagesList extends React.Component {
     return (
       <div className='privateChannels-1nO12o'>
         <div className='searchBar-6Kv8R2'>
-          <SearchBar style={{ width: '100%' }} />
+          <SearchBar query='' style={{ width: '100%' }} />
         </div>
 
         <VerticalScroller className='scrollerThemed-2oenus themeGhostHairlineChannels-3G0x9_ scrollerFade-1Ijw5y'>
