@@ -1,12 +1,4 @@
-const { getModule } = require('powercord/webpack');
-const { getRelationships } = getModule([ 'getRelationships' ]);
-
 module.exports = ({
-  isFriend: (id) => {
-    const relationships = getRelationships();
-    return Object.keys(relationships).filter(relation => relationships[relation] === 1).includes(id);
-  },
-  isFavoriteFriend: (id) => powercord.pluginManager.get('betterfriends').settings.config.favfriends.includes(id),
   Statuses: {
     online: {
       friendly: 'online',
@@ -31,7 +23,8 @@ module.exports = ({
     FavoriteFriendChannel: [ 'bf-direct-messages', 'bf-direct-messages-mount' ],
     FavoriteFriendsSection: [ 'bf-favorite-friends-tabbar' ],
     InformationModal: [ 'bf-message-listener' ],
-    StatusPopup: [ 'bf-user' ]
+    StatusPopup: [ 'bf-user' ],
+    ChannelTypingIntegration: [ 'bf-ct-integration' ]
   },
   Sounds: {
     message1: 'Message',
