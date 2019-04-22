@@ -60,8 +60,7 @@ module.exports = async function () {
     this.log('Tab bar mounted');
   });
 
-  inject('a', COMPONENTS.FRIEND_TABLE, 'render', (a, res) => {
-    console.log(res);
+  inject('bf-friends-table-render', COMPONENTS.FRIEND_TABLE, 'render', (a, res) => {
     if (res.props.children[0].props.children.props.selectedItem.toString() === '() => true') {
       res.props.children[1].props.children[1].props.children = ALL_FRIENDS
         .filter(n => this.FAV_FRIENDS.includes(n.key))

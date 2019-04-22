@@ -8,7 +8,7 @@ const { Star } = require('./../components');
  * Handles the displaying of the little star emoji next to favorited friends in both chat and in member lists.
  */
 module.exports = async function () {
-  if (!this.settings.config.displaystar) {
+  if (!this.settings.get('displaystar')) {
     return;
   }
   await waitFor('.pc-username');
