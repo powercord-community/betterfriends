@@ -7,8 +7,8 @@ const { Sounds } = require('./../Constants');
  * Handles custom notification sounds
  */
 module.exports = async function () {
-  const playSound = getModule([ 'playSound' ]);
-  const custom = this.settings.config.notifsounds;
+  const playSound = await getModule([ 'playSound' ]);
+  const custom = this.settings.get('notifsounds');
 
   const AUDIO = Object.keys(custom).map(s => {
     const sound = custom[s];

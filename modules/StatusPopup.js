@@ -21,7 +21,7 @@ const statuses = {
  * Contributors: aetheryx#0001
  */
 module.exports = async function () {
-  if (!this.settings.config.statuspopup) {
+  if (!this.settings.get('statuspopup')) {
     return;
   }
   const { getStatus } = await getModule([ 'getStatus' ]);

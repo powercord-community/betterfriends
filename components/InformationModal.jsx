@@ -1,9 +1,5 @@
 const { React, getModule } = require('powercord/webpack');
 const { Confirm } = require('powercord/components/modal');
-const { getChannel } = getModule([ 'getChannel' ]);
-const { getUser } = getModule([ 'getUser' ]);
-const { getGuild } = getModule([ 'getGuild' ]);
-const { getMessage } = getModule([ 'getMessages' ]);
 const { close: closeModal } = require('powercord/modal');
 
 module.exports = class InformationModal extends React.Component {
@@ -46,7 +42,20 @@ module.exports = class InformationModal extends React.Component {
     return (properArr.slice(0, -2).join(', ') + (properArr.slice(0, -2).length ? ', ' : '') + properArr.slice(-2).join(' and ')) || '0 seconds';
   }
 
+  async componentDidMount () {
+    this.setState({
+      getChannel: (await getModule([ 'getChannel' ])).getChannel,
+      getUser: (await getModule([ 'getUser' ])).getUser,
+      getGuild: (await getModule([ 'getGuild' ])).getGuild,
+      getMessage: (await getModule([ 'getMessages' ])).getMessages
+    });
+  }
+
   render () {
+    if (!this.state) {
+      return null;
+    }
+    const { getUser, getChannel, getGuild, getMessage } = this.state;
     return (
       <Confirm
         red={false}
