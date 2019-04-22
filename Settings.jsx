@@ -1,20 +1,8 @@
 const { React } = require('powercord/webpack');
-const { getOwnerInstance } = require('powercord/util');
 const { getModule, getModuleByDisplayName, getComponentByDisplayName } = require('powercord/webpack');
-const { getRelationships } = getModule([ 'getRelationships' ]);
 const { SwitchItem, TextInput } = require('powercord/components/settings');
-const { getUser } = getModule([ 'getUser' ]);
 const { Sounds } = require('./Constants');
-const Text = getModuleByDisplayName('Text');
-const PopoutList = getModuleByDisplayName('PopoutList');
-const FormDivider = getComponentByDisplayName('FormDivider');
-const PopoutListSearchBar = PopoutList.prototype.constructor.SearchBar;
-const PopoutListDivider = PopoutList.prototype.constructor.Divider;
-const VerticalScroller = getModuleByDisplayName('VerticalScroller');
-const Flex = getModuleByDisplayName('Flex');
-const Avatar = getModuleByDisplayName('Avatar');
-const FlexChild = Flex.prototype.constructor.Child;
-const SelectableItem = PopoutList.prototype.constructor.Item;
+
 
 module.exports = class Settings extends React.Component {
   constructor (props) {
@@ -33,9 +21,29 @@ module.exports = class Settings extends React.Component {
     };
   }
 
+  async componentDidMount () {
+    this.setState({
+      VerticalScroller: await getModuleByDisplayName('VerticalScroller'),
+      Flex: await getModuleByDisplayName('Flex'),
+      Avatar: await getModuleByDisplayName('Avatar'),
+      Text: await getModuleByDisplayName('Text'),
+      PopoutList: await getComponentByDisplayName('PopoutList'),
+      FormDivider: await getComponentByDisplayName('FormDivider'),
+      playSound: (await getModule([ 'playSound' ])).playSound,
+      getUser: (await getModule([ 'getUser' ])).getUser,
+      getRelationships: (await getModule([ 'getRelationships' ])).getRelationships
+    });
+  }
+
   render () {
-    const { playSound } = getModule([ 'playSound' ]);
+    const { VerticalScroller, Flex, Avatar, Text, PopoutList, FormDivider, playSound, getUser, getRelationships } = this.state;
+    const PopoutListSearchBar = PopoutList.prototype.constructor.SearchBar;
+    const PopoutListDivider = PopoutList.prototype.constructor.Divider;
+    const FlexChild = Flex.prototype.constructor.Child;
+    const SelectableItem = PopoutList.prototype.constructor.Item;
+
     const relationships = getRelationships();
+    const friends = Object.keys(relationships).filter(relation => relationships[relation] === 1);
     return (
       <div>
         <h5 className='h5-18_1nd title-3sZWYQ size12-3R0845 height16-2Lv3qA weightSemiBold-NJexzi marginBottom8-AtZOdT'>
@@ -59,10 +67,9 @@ module.exports = class Settings extends React.Component {
           <VerticalScroller
             className='scroller-2CvAgC pc-scroller'
           >
-            {Object.keys(relationships)
-              .filter(relation => relationships[relation] === 1)
+            {friends
               .map(getUser)
-              .filter(user => this.state.friendsQuery ? user.username.includes(this.state.friendsQuery) : true)
+              .filter(user => this.state.friendsQuery ? user.username.includes(this.state.friendsQuery.toLowerCase()) : true)
               .map((user, i) =>
                 <SelectableItem className='bf-friend-item' id={user.id} key={i.toString()} selected={this.state.favfriends.includes(user.id)} onClick={(e) => {
                   if (!e.selected) {
@@ -71,7 +78,6 @@ module.exports = class Settings extends React.Component {
                   } else {
                     this._set('favfriends', this.state.favfriends.filter(a => a !== e.id));
                   }
-                  e.setState({ selected: true });
                 }}>
                   <Flex align='alignCenter-1dQNNs' basis='auto' grow={1} shrink={1}>
                     <div>
@@ -92,6 +98,11 @@ module.exports = class Settings extends React.Component {
                     </div>
                   </Flex>
                 </SelectableItem>)
+              .sort((a, b) => {
+                const firstName = a.props.children.props.children.props.children.props.children[1].props.children.props.children[0].props.children;
+                const secondName = b.props.children.props.children.props.children.props.children[1].props.children.props.children[0].props.children;
+                return firstName.localeCompare(secondName);
+              })
             }
           </VerticalScroller>
         </PopoutList>
