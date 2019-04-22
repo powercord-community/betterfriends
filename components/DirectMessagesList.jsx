@@ -24,6 +24,8 @@ module.exports = class BetterFriendsDirectMessagesList extends React.Component {
       getRelationships: (await getModule([ 'getRelationships' ])).getRelationships,
       getCurrentUser: (await getModule([ 'getCurrentUser' ])).getCurrentUser,
       getStatus: (await getModule([ 'getStatus' ])).getStatus,
+      isMobileOnline: (await getModule([ 'isMobileOnline' ])).isMobileOnline,
+      getPrimaryActivity: (await getModule([ 'getPrimaryActivity' ])).getPrimaryActivity,
       typingStore: await getModule([ 'getTypingUsers' ])
     });
   }

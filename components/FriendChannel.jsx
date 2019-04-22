@@ -60,7 +60,7 @@ module.exports = class BetterFriendChannel extends React.Component {
   }
 
   render () {
-    const { getDMFromUserId, getRelationships, getStatus, typingStore } = this._modules;
+    const { getDMFromUserId, getRelationships, getStatus, typingStore, isMobileOnline, getPrimaryActivity } = this._modules;
     return (() => {
       // Group DM
       if (this.target.type === 3) {
@@ -109,8 +109,13 @@ module.exports = class BetterFriendChannel extends React.Component {
 
       return ((() => {
         const status = getStatus(this.target.id);
+        const mobile = isMobileOnline(this.target.id);
+        const activity = getPrimaryActivity(this.target.id);
         const channel = getDMFromUserId(this.target.id);
         const isTyping = Object.keys(typingStore.getTypingUsers(channel)).includes(this.target.id);
+
+        const MOBILE_ICON = <svg name='MobileDevice' className='mobileIndicator-3gyhuE' width='16' height='16' viewBox='0 0 24 24'><g fill='none' fill-rule='evenodd'><path fill='currentColor' d='M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z'></path></g></svg>;
+
         return (<div className={`channel-2QD9_O pc-channel pc-friendchannel bf-channel ${this.selected ? 'selected-1HYmZZ' : ''}`} style={{ height: '42px',
           opacity: 1 }}>
           <a href={`/channels/@me/${channel}`} onClick={this.userClick}>
@@ -123,7 +128,22 @@ module.exports = class BetterFriendChannel extends React.Component {
                 }} />}
               </div>
             </div>
-            <div className='nameWrapper-10v56U'><span className='name-2WpE7M'>{this.target.username}</span></div>
+            {(() => {
+              if (activity) {
+                return <div className='name-2WpE7M'>
+                  <span className='nameWithActivity-1ceSyU'>{this.target.username}</span>
+                  {mobile && MOBILE_ICON}
+                  <div className='flex-1xMQg5 flex-1O1GKY horizontal-1ae9ci horizontal-2EEEnY flex-1O1GKY directionRow-3v3tfG justifyStart-2NDFzi alignCenter-1dQNNs noWrap-3jynv6 activity-525YDR'>
+                    <div className='activityText-OW8WYb'>
+                      Playing <strong>{activity.name}</strong>
+                    </div>
+                    {activity.application_id && <svg name='RichActivity' className='activityIcon-1mtTk4' width='16' height='16' viewBox='0 0 16 16'><path className='activityIconForeground-3VIgI8' fill='currentColor' d='M6,7 L2,7 L2,6 L6,6 L6,7 Z M8,5 L2,5 L2,4 L8,4 L8,5 Z M8,3 L2,3 L2,2 L8,2 L8,3 Z M8.88888889,0 L1.11111111,0 C0.494444444,0 0,0.494444444 0,1.11111111 L0,8.88888889 C0,9.50253861 0.497461389,10 1.11111111,10 L8.88888889,10 C9.50253861,10 10,9.50253861 10,8.88888889 L10,1.11111111 C10,0.494444444 9.5,0 8.88888889,0 Z' transform='translate(3 3)'></path></svg>}
+                  </div>
+                </div>;
+              }
+              return <div className='nameWrapper-10v56U'><span className='name-2WpE7M'>{this.target.username}</span>{mobile && MOBILE_ICON}</div>;
+            })()}
+
             {Plugin.FAV_FRIENDS.includes(this.target.id) && infomodal && <Tooltip className='bf-information-tooltip' text='User Information' position='top'><Info className='bf-information' onClick={this.informationClick} /></Tooltip>}
             {!Plugin.FAV_FRIENDS.includes(this.target.id) && <button className='close-3hZ5Ni'></button>}
           </a>
