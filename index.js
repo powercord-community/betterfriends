@@ -12,16 +12,17 @@ module.exports = class BetterFriends extends Plugin {
    */
   async startPlugin () {
     // Default settings handler
-    const get = this.settings.get.bind(this.settings);
     this.DEFAULT_SETTINGS = {
-      favfriends: get('favfriends', []),
-      notifsounds: get('notifsounds', {}),
-      infomodal: get('infomodal', true),
-      displaystar: get('displaystar', true),
-      statuspopup: get('statuspopup', true)
+      favfriends: this.settings.get('favfriends', []),
+      notifsounds: this.settings.get('notifsounds', {}),
+      infomodal: this.settings.get('infomodal', true),
+      displaystar: this.settings.get('displaystar', true),
+      statuspopup: this.settings.get('statuspopup', true)
     };
     for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
-      this.settings.set(this.DEFAULT_SETTINGS[setting]);
+      if (this.DEFAULT_SETTINGS[setting] === undefined) { /* eslint-disable-line */ /* I know this is bad practice, hopefully I'll find a better solution soon */
+        this.settings.set(this.DEFAULT_SETTINGS[setting]);
+      }
     }
 
     // Constants
@@ -57,7 +58,7 @@ module.exports = class BetterFriends extends Plugin {
     }
 
     // Unload all modules if this user has no favorite friends
-    if (this.FAV_FRIENDS.length !== 0) {
+    if (this.FAV_FRIENDS && this.FAV_FRIENDS.length !== 0) {
       this.load();
     }
   }
