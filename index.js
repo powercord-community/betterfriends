@@ -11,6 +11,19 @@ module.exports = class BetterFriends extends Plugin {
    * Start the plugin
    */
   async startPlugin () {
+    // Default settings handler
+    const get = this.settings.get.bind(this.settings);
+    this.DEFAULT_SETTINGS = {
+      favfriends: get('favfriends', []),
+      notifsounds: get('notifsounds', {}),
+      infomodal: get('infomodal', true),
+      displaystar: get('displaystar', true),
+      statuspopup: get('statuspopup', true)
+    };
+    for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
+      this.settings.set(this.DEFAULT_SETTINGS[setting]);
+    }
+
     // Constants
     this.FAV_FRIENDS = this.settings.get('favfriends');
     this.FRIEND_DATA = {
@@ -43,11 +56,9 @@ module.exports = class BetterFriends extends Plugin {
       this.MODULES[module] = this.MODULES[module].bind(this);
     }
 
-    // Load the entire plugin + all modules
-    this.load();
     // Unload all modules if this user has no favorite friends
-    if (this.FAV_FRIENDS.length === 0) {
-      this.unload();
+    if (this.FAV_FRIENDS.length !== 0) {
+      this.load();
     }
   }
 
