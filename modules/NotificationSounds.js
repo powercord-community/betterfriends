@@ -8,7 +8,7 @@ const { Sounds } = require('./../Constants');
  */
 module.exports = async function () {
   const playSound = await getModule([ 'playSound' ]);
-  const custom = this.settings.get('notifsounds');
+  const custom = this.settings.get('notifsounds', {});
 
   const AUDIO = Object.keys(custom).map(s => {
     const sound = custom[s];

@@ -4,16 +4,15 @@ const { resolve } = require('path');
 
 /*
  * [ Channel Typing Integration ]
- * Integrates new features into `powercord-channelTyping`
+ * Integrates new features into `channel-typing`
  * Contributors: Bowser65#0001
  */
 module.exports = async function () {
   try {
-    const typingModule = require.resolve(resolve(`${__dirname}./../../powercord-channelTyping/index.js`));
+    const typingModule = require.resolve(resolve(`${__dirname}/../../channel-typing/index.js`));
     const typingStore = await getModule([ 'getTypingUsers' ]);
     inject('bf-ct-integration', require.cache[typingModule].exports.prototype, '_renderTypingElement', (args, res) => {
-      const info = args[0];
-      if (this.FAV_FRIENDS.some(fr => Object.keys(typingStore.getTypingUsers(info.id)).includes(fr))) {
+      if (this.FAV_FRIENDS.some(fr => Object.keys(typingStore.getTypingUsers(args[0].id)).includes(fr))) {
         res.props.style.filter = 'sepia(300%) hue-rotate(313deg) saturate(1600%)';
       }
       return res;

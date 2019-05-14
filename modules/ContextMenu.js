@@ -1,8 +1,7 @@
 const { React } = require('powercord/webpack');
-const { getModuleByDisplayName } = require('powercord/webpack');
+const { getModuleByDisplayName, getModule } = require('powercord/webpack');
 const { inject } = require('powercord/injector');
 const { ContextMenu: { Button } } = require('powercord/components');
-const { isFriend, isFavoriteFriend } = require('./../Constants');
 
 /*
  * [ Context Menu ]
@@ -11,6 +10,12 @@ const { isFriend, isFavoriteFriend } = require('./../Constants');
  */
 module.exports = async function () {
   const UserContextMenu = await getModuleByDisplayName('UserContextMenu');
+  const { getRelationships } = await getModule([ 'getRelationships' ]);
+  const isFriend = (id) => {
+    const relationships = getRelationships();
+    return Object.keys(relationships).filter(relation => relationships[relation] === 1).includes(id);
+  };
+  const isFavoriteFriend = (id) => this.FAV_FRIENDS.includes(id);
   inject('bf-contextmenu-listener', UserContextMenu.prototype, 'render', (args, res) => {
     this.log(res);
     const id = res.props.children.props.children.props.children[0].props.children[0].props.userId;
@@ -33,7 +38,7 @@ module.exports = async function () {
             onClick: () => {
               this.FAV_FRIENDS = this.FAV_FRIENDS.filter(a => a !== id);
               this.settings.set('favfriends', this.FAV_FRIENDS);
-              this.reload('FavoriteFriendChannel', 'FavoriteFriendsSection');
+              this.reload('FavoriteFriendChannel', 'FavoriteFriendsSection', 'DisplayStar');
             }
           })
         );

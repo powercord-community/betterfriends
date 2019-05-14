@@ -1,3 +1,4 @@
+const { AsyncComponent } = require('powercord/components');
 const { waitFor, getOwnerInstance, sleep } = require('powercord/util');
 const { React } = require('powercord/webpack');
 const { inject } = require('powercord/injector');
@@ -9,6 +10,7 @@ const { inject } = require('powercord/injector');
  */
 module.exports = async function () {
   let ALL_FRIENDS = [];
+  const Item = AsyncComponent.from('Item');
   if (!document.querySelector('.pc-tabBar')) {
     await waitFor('.pc-tabBar');
   }
@@ -36,7 +38,9 @@ module.exports = async function () {
     if (!ALL_FRIENDS.length) {
       ALL_FRIENDS = originalRows._rows;
     }
-    originalRows._rows = originalRows._rows.filter(n => this.FAV_FRIENDS.includes(n.key));
+    originalRows._rows = ALL_FRIENDS
+      .filter(n => this.FAV_FRIENDS.includes(n.key))
+      .map(a => React.createElement(Item, a));
     COMPONENTS.FRIEND_TABLE.state.section = () => true;
   };
 
@@ -46,10 +50,9 @@ module.exports = async function () {
     }
   };
 
-  const select = async (e) => {
+  const select = (e) => {
     const { target } = e;
     target.classList.add('itemSelected-1qLhcL', 'selected-3s45Ha');
-    await sleep(4);
     this.log('Favorited button clicked');
     populateFavoriteFriends();
     COMPONENTS.FRIEND_TABLE.forceUpdate();
@@ -61,7 +64,9 @@ module.exports = async function () {
   });
 
   inject('bf-friends-table-render', COMPONENTS.FRIEND_TABLE, 'render', (a, res) => {
-    if (res.props.children[0].props.children.props.selectedItem.toString() === '() => true') {
+    console.log(res.props.children[0].props.children[3].props);
+    if (res.props.children[0].props.children[3].props.selectedItem.toString() === '() => true') {
+      console.log(res.props.children[1].props.children[1].props);
       res.props.children[1].props.children[1].props.children = ALL_FRIENDS
         .filter(n => this.FAV_FRIENDS.includes(n.key))
         .map(a => React.createElement(res.props.children[1].props.children[1].props.children[0].type || 'div', a));
@@ -83,17 +88,23 @@ module.exports = async function () {
     }
     COMPONENTS.FRIEND_TABLE.render();
 
-    const FAV_FRIENDS_BUTTON = React.createElement('div', {
+    const FAV_FRIENDS_BUTTON = React.createElement(Item, {
       id: 'FAVORITED',
       selectedItem: res.props.children[0].props.selectedItem,
       itemType: 'topPill-30KHOu',
       className: 'itemDefault-3Jdr52 item-PXvHYJ item-3HpYcP',
-      onMouseDown: select
+      onMouseDown () {
+        console.log('clicked')
+        res.props.children[1].props.id = 'FAVORITED';
+        res.props.children[1].props.selectedItem = '() => true';
+        COMPONENTS.FRIEND_TABLE.render();
+      }
     }, 'Favorited');
 
     // Only inject in the first 'All' button
-    if (res.props.children && res.props.children[2] && res.props.children[2].props.children === 'All') {
-      res.props.children.splice(3, 0, FAV_FRIENDS_BUTTON);
+    console.log(res.props.children);
+    if (res.props.children && res.props.children[1] && res.props.children[1].props.children === 'All') {
+      res.props.children.splice(2, 0, FAV_FRIENDS_BUTTON);
     }
     return res;
   });

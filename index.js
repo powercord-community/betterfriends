@@ -11,22 +11,29 @@ module.exports = class BetterFriends extends Plugin {
    * Start the plugin
    */
   async startPlugin () {
+    await this.start();
+  }
+
+  start () {
     // Default settings handler
     this.DEFAULT_SETTINGS = {
-      favfriends: this.settings.get('favfriends', []),
-      notifsounds: this.settings.get('notifsounds', {}),
-      infomodal: this.settings.get('infomodal', true),
-      displaystar: this.settings.get('displaystar', true),
-      statuspopup: this.settings.get('statuspopup', true)
+      favfriends: [],
+      notifsounds: {},
+      infomodal: true,
+      displaystar: true,
+      statuspopup: true
     };
-    for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
-      if (this.DEFAULT_SETTINGS[setting] === undefined) { /* eslint-disable-line */ /* I know this is bad practice, hopefully I'll find a better solution soon */
-        this.settings.set(this.DEFAULT_SETTINGS[setting]);
+    this.FAV_FRIENDS = this.settings.get('favfriends');
+    if (!this.FAV_FRIENDS) {
+      this.FAV_FRIENDS = [];
+      for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
+        if (this.DEFAULT_SETTINGS[setting] === undefined && !this.FAV_FRIENDS) { /* eslint-disable-line */ /* I know this is bad practice, hopefully I'll find a better solution soon */
+          this.settings.set(this.settings.get(setting, this.DEFAULT_SETTINGS[setting]));
+        }
       }
     }
 
     // Constants
-    this.FAV_FRIENDS = this.settings.get('favfriends');
     this.FRIEND_DATA = {
       statusStorage: {},
       lastMessageID: {}
@@ -58,7 +65,7 @@ module.exports = class BetterFriends extends Plugin {
     }
 
     // Unload all modules if this user has no favorite friends
-    if (this.FAV_FRIENDS && this.FAV_FRIENDS.length !== 0) {
+    if (this.FAV_FRIENDS && this.FAV_FRIENDS.length > 0) {
       this.load();
     }
   }

@@ -1,10 +1,11 @@
 {
   "name": "Better Friends",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Improves Discord's friend feature in a multitude of ways",
   "author": "Nevulo#0007",
   "license": "MIT",
   "optionalDependencies": [
-    "pc-spotify"
+    "pc-spotify",
+    "channel-typing"
   ]
 }

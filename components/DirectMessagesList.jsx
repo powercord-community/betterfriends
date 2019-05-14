@@ -98,7 +98,7 @@ module.exports = class BetterFriendsDirectMessagesList extends React.Component {
           target,
           selected: determineIfSelected(channel.id) });
       }))
-    ];
+    ].filter(Boolean);
 
     return channels;
   }

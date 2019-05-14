@@ -39,6 +39,11 @@
    padding-left: 12px;
    background: url('https://canary.discordapp.com/assets/e4d52f4d69d7bba67e5fd70ffe26b70d.svg') 50% no-repeat;
    background-size: 9px 9px;
+   &.bf-star-member {
+      width: 9px;
+      height: 9px;
+      padding-left: 6px;
+   }
 }
 
 .bf-information {
