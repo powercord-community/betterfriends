@@ -82,11 +82,28 @@ module.exports = async function () {
 
   // Patch DM list
   const PrivateChannelsList = getOwnerInstance(await waitFor('.pc-privateChannels'))._reactInternalFiber.return.return.child.child.child.child.memoizedProps.children[1].type;
+  const ConnectedFavouriteFriends = this.settings.connectStore(({ getSetting, toggleSetting }) => {
+    return [
+      React.createElement('header', {
+        className: `bf-ff-header${!getSetting('collapseInDMs', false) ? ' opened' : ''}`,
+        onClick: () => toggleSetting('collapseInDMs')
+      }, [
+        React.createElement('svg', {
+          xmlns: 'http://www.w3.org/2000/svg',
+          viewBox: '0 0 24 24'
+        }, React.createElement('path', {
+          fill: '#fff',
+          d: 'M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41L10.7 17.3c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z'
+        })),
+        React.createElement('span', null, 'Favourite Friends')
+      ]),
+      !_this.settings.get('collapseInDMs', false) && _this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId }))
+    ];
+  });
   inject('bf-direct-messages', PrivateChannelsList.prototype, 'render', (args, res) => {
     res.props.children = [
       res.props.children.slice(0, res.props.children.length - 1),
-      React.createElement('header', null, 'Favourite Friends'),
-      this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId })),
+      React.createElement(ConnectedFavouriteFriends),
       res.props.children.slice(res.props.children.length - 1)
     ];
     return res;

@@ -1,4 +1,3 @@
-
 .bf-friend {
    margin: 6px;
    width: 32px;
@@ -91,26 +90,23 @@
    display: none;
 }
 
-.bf-channel {
-   cursor: pointer;
-}
-
-.bf-header-privatechannels {
-   color: #fff;
-   cursor: default;
-   display: block;
-   font-size: 12px;
-   font-weight: 500;
-   margin-top: 12px;
-   opacity: .3;
-   overflow: hidden;
-   padding: 9px 20px;
-   text-overflow: ellipsis;
-   text-transform: uppercase;
-   transition: opacity .15s ease;
-   white-space: nowrap;
-}
-
 .searchBar-2_Yu-C {
    width: 100%;
+}
+
+html body .bf-ff-header { // html body is used to get a more precise selector
+   display: flex !important;
+   align-items: center;
+
+   svg {
+      margin-right: 5px;
+      transition: .2s;
+      width: 18px;
+      height: 18px;
+      transform-origin: 50% 50%;
+   }
+
+   &.opened svg {
+      transform: rotate(90deg);
+   }
 }
