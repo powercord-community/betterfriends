@@ -1,20 +1,94 @@
 const { inject } = require('powercord/injector');
-const { React, getModuleByDisplayName, Flux, getModule } = require('powercord/webpack');
-let { DirectMessagesList } = require('./../components');
+const { open: openModal } = require('powercord/modal');
+const { getOwnerInstance, waitFor } = require('powercord/util');
+const { Icons: { Info }, Tooltip } = require('powercord/components');
+const { React, Flux, getModuleByDisplayName, getModule, constants: { Routes } } = require('powercord/webpack');
+
+const InformationModal = require('../components/InformationModal');
 
 /*
  * [ Friend DM Channel ]
  * Creates and populates the "Favorited Friends" section on the private channel/DMs screen
  */
 module.exports = async function () {
-  const PrivateChannelsList = await getModuleByDisplayName('PrivateChannelsList');
-  const typingStore = await getModule([ 'getTypingUsers' ]);
-  const { getCurrentUser } = await getModule([ 'getCurrentUser' ]);
+  const _this = this;
+  const PrivateChannel = await getModuleByDisplayName('PrivateChannel');
+  const dms = await getModule([ 'openPrivateChannel' ]);
+  const transition = await getModule([ 'transitionTo' ]);
+  const userStore = await getModule([ 'getUser' ]);
+  const channelStore = await getModule([ 'getChannel', 'getDMFromUserId' ]);
+  const activityStore = await getModule([ 'getPrimaryActivity' ]);
+  const statusStore = await getModule([ 'getStatus' ]);
 
-  DirectMessagesList = Flux.connectStores(
-    [ typingStore ],
-    ({ id }) => ({ typingCount: Object.keys(typingStore.getTypingUsers(id)).filter(id => id !== getCurrentUser().id).length })
-  )(DirectMessagesList);
+  // Patch PrivateChannel
+  inject('bf-direct-messages-channel', PrivateChannel.prototype, 'render', function (args, res) {
+    if (this.props.isBetterFriends) {
+      res.props.children.props.children[2] = this.props.infoModal
+        ? React.createElement(Tooltip, {
+          text: 'User Information',
+          position: 'top'
+        }, React.createElement(Info, {
+          className: 'bf-information',
+          onClick: e => {
+            e.stopPropagation();
+            e.preventDefault();
+            const info = _this.FRIEND_DATA.lastMessageID[this.props.user.id];
+            openModal(() => React.createElement(InformationModal, {
+              user: this.props.user,
+              channel: !info ? 'nothing' : info.channel,
+              message: !info ? 'nothing' : info.id
+            }));
+          }
+        }))
+        : null;
 
-  inject('bf-direct-messages', PrivateChannelsList.prototype, 'render', () => React.createElement(DirectMessagesList, { thisObj: this }));
+      if (this.props.channel.id === '0') {
+        res.props.onMouseDown = () => void 0;
+        res.props.children = React.createElement('a', null, res.props.children.props.children);
+        res.props.onClick = async () => {
+          const channelId = await dms.openPrivateChannel(userStore.getCurrentUser().id, this.props.user.id);
+          // eslint-disable-next-line new-cap
+          transition.transitionTo(Routes.CHANNEL('@me', channelId));
+        };
+      }
+    }
+    return res;
+  });
+
+  // Build connected component
+  const ConnectedPrivateChannel = Flux.connectStores(
+    [ userStore, channelStore, activityStore, statusStore, powercord.api.settings.store ],
+    ({ userId }) => {
+      const channelId = channelStore.getDMFromUserId(userId);
+      const user = userStore.getUser(userId);
+      const channel = channelId
+        ? channelStore.getChannel(channelId)
+        : {
+          id: '0',
+          type: 1,
+          toString: () => user.username
+        };
+
+      return {
+        user,
+        channel,
+        status: statusStore.getStatus(userId),
+        activity: activityStore.getPrimaryActivity(userId),
+        infoModal: powercord.api.settings.store.getSetting('betterfriends', 'infomodal'),
+        isBetterFriends: true
+      };
+    }
+  )(PrivateChannel);
+
+  // Patch DM list
+  const PrivateChannelsList = getOwnerInstance(await waitFor('.pc-privateChannels'))._reactInternalFiber.return.return.child.child.child.child.memoizedProps.children[1].type;
+  inject('bf-direct-messages', PrivateChannelsList.prototype, 'render', (args, res) => {
+    res.props.children = [
+      res.props.children.slice(0, res.props.children.length - 1),
+      React.createElement('header', null, 'Favourite Friends'),
+      this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId })),
+      res.props.children.slice(res.props.children.length - 1)
+    ];
+    return res;
+  });
 };

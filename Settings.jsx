@@ -92,9 +92,9 @@ module.exports = class Settings extends React.Component {
                           />
                         </FlexChild>
                         <FlexChild key='user-text' basis='auto' grow={1} shrink={1} wrap={false}>
-                          <div class='userText-1WDPps'>
-                            <span class='userText-1WDPps'>{user.username}</span>
-                            <span class='discriminator-3tYCOD'>#{user.discriminator}</span>
+                          <div className='userText-1WDPps'>
+                            <span className='userText-1WDPps'>{user.username}</span>
+                            <span className='discriminator-3tYCOD'>#{user.discriminator}</span>
                           </div>
                         </FlexChild>
                       </Flex>
@@ -164,7 +164,7 @@ module.exports = class Settings extends React.Component {
 
               <div style={{ float: 'right' }}>
                 <div style={{ float: 'left' }}>
-                  <button onClick={() => playSound(sound)} className='bf-notification-sounds-icon button-1Pkqso iconButton-eOTKg4 button-38aScr lookOutlined-3sRXeN colorWhite-rEQuAQ buttonSize-2Pmk-w iconButtonSize-U9SCYe grow-q77ONN'></button>
+                  <button onClick={() => playSound(sound)} className='bf-notification-sounds-icon button-1Pkqso iconButton-eOTKg4 button-38aScr lookOutlined-3sRXeN colorWhite-rEQuAQ buttonSize-2Pmk-w iconButtonSize-U9SCYe grow-q77ONN'/>
                 </div>
                 <div style={{ float: 'right',
                   paddingLeft: '16px' }}>

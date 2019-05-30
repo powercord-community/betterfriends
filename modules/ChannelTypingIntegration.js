@@ -18,7 +18,7 @@ module.exports = async function () {
       return res;
     });
   } catch (e) {
-    this.log('"powercord-channelTyping" doesn\'t seem to be present in the plugins folder, unloading companion module');
+    this.log('"channel-typing" doesn\'t seem to be present in the plugins folder, unloading companion module');
     this.unload('ChannelTypingIntegration');
   }
 };
