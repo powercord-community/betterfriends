@@ -103,11 +103,10 @@ module.exports = class BetterFriends extends Plugin {
     } else {
       this.log('Plugin stopped');
       for (const unload of Object.keys(this.MODULES)) {
-        for (const injection of InjectionIDs[unload]) {
+        for (const injection of (InjectionIDs[unload] || [])) {
           uninject(injection);
         }
       }
-      this.unloadCSS();
     }
   }
 
