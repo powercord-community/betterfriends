@@ -19,6 +19,9 @@ module.exports = async function () {
   const channelStore = await getModule([ 'getChannel', 'getDMFromUserId' ]);
   const activityStore = await getModule([ 'getPrimaryActivity' ]);
   const statusStore = await getModule([ 'getStatus' ]);
+  const { getPrivateChannelTimestamps } = await getModule([ 'getPrivateChannelTimestamps' ]);
+  const { lastMessageId } = await getModule([ 'lastMessageId' ]);
+  const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
 
   // Patch PrivateChannel
   inject('bf-direct-messages-channel', PrivateChannel.prototype, 'render', function (args, res) {
@@ -85,18 +88,22 @@ module.exports = async function () {
   inject('bf-direct-messages', PrivateChannelsList.prototype, 'render', (args, res) => {
     res.props.children = [
       // Previous elements
-      ...res.props.children.slice(0, res.props.children.length - 1),
+      res.props.children.slice(0, res.props.children.length - 1),
       // Header
-      this.FAV_FRIENDS.length > 0 && React.createElement('header', null, 'Favourite Friends'),
+      this.FAV_FRIENDS.length > 0 && React.createElement('header', null, 'Favorite Friends'),
       // Friends
-      ...this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId })),
+      this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId })),
       // Previous elements
-      ...res.props.children.slice(res.props.children.length - 1)
+      res.props.children.slice(res.props.children.length - 1)
     ];
-    res.props.privateChannelIds = res.props.privateChannelIds.filter(c => {
-      const channel = channelStore.getChannel(c);
-      return channel.type !== 1 || !this.FAV_FRIENDS.includes(channel.recipients[0]);
-    });
+    const ALL = Object.keys(getPrivateChannelTimestamps()).reverse();
+    this.FAV_FRIENDS.sort((a, b) => lastMessageId(getDMFromUserId(b)) - lastMessageId(getDMFromUserId(a)));
+    res.props.privateChannelIds = res.props.privateChannelIds
+      .filter(c => {
+        const channel = channelStore.getChannel(c);
+        return channel.type !== 1 || !this.FAV_FRIENDS.includes(channel.recipients[0]);
+      });
+
     return res;
   });
 };
