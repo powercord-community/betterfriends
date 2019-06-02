@@ -19,7 +19,6 @@ module.exports = async function () {
   const channelStore = await getModule([ 'getChannel', 'getDMFromUserId' ]);
   const activityStore = await getModule([ 'getPrimaryActivity' ]);
   const statusStore = await getModule([ 'getStatus' ]);
-  const { getPrivateChannelTimestamps } = await getModule([ 'getPrivateChannelTimestamps' ]);
   const { lastMessageId } = await getModule([ 'lastMessageId' ]);
   const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
 
@@ -96,7 +95,6 @@ module.exports = async function () {
       // Previous elements
       res.props.children.slice(res.props.children.length - 1)
     ];
-    const ALL = Object.keys(getPrivateChannelTimestamps()).reverse();
     this.FAV_FRIENDS.sort((a, b) => lastMessageId(getDMFromUserId(b)) - lastMessageId(getDMFromUserId(a)));
     res.props.privateChannelIds = res.props.privateChannelIds
       .filter(c => {

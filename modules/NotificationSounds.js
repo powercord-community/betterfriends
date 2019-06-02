@@ -24,6 +24,7 @@ module.exports = async function () {
     } else {
       this.log(`${type} was missing from audio cache, loading it manually`);
       const audio = new Audio();
+      audio.pause();
       audio.src = custom[type].url;
       audio.volume = custom[type].volume;
       audio.play();
