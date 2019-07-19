@@ -25,7 +25,6 @@ module.exports = class Settings extends React.Component {
     this.setState({
       VerticalScroller: await getModuleByDisplayName('VerticalScroller'),
       Flex: await getModuleByDisplayName('Flex'),
-      Avatar: await getModuleByDisplayName('Avatar'),
       Text: await getModuleByDisplayName('Text'),
       PopoutList: await getModuleByDisplayName('PopoutList'),
       FormDivider: await getModuleByDisplayName('FormDivider'),
@@ -39,7 +38,7 @@ module.exports = class Settings extends React.Component {
     if (!this.state.VerticalScroller) {
       return null;
     }
-    const { VerticalScroller, Flex, Avatar, Text, PopoutList, FormDivider, playSound, getUser, getRelationships } = this.state;
+    const { VerticalScroller, Flex, Text, PopoutList, FormDivider, playSound, getUser, getRelationships } = this.state;
     const PopoutListSearchBar = PopoutList.prototype.constructor.SearchBar;
     const PopoutListDivider = PopoutList.prototype.constructor.Divider;
     const FlexChild = Flex.prototype.constructor.Child;
@@ -86,9 +85,11 @@ module.exports = class Settings extends React.Component {
                     <div>
                       <Flex align='alignCenter-1dQNNs' basis='auto' grow={1} shrink={1}>
                         <FlexChild key='avatar' basis='auto' grow={0} shrink={0} wrap={false}>
-                          <Avatar
+                          <img
                             src={!user.avatar ? `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png` : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
-                            size='small'
+                            width={32}
+                            height={32}
+                            style={{ borderRadius: '360px' }}
                           />
                         </FlexChild>
                         <FlexChild key='user-text' basis='auto' grow={1} shrink={1} wrap={false}>
