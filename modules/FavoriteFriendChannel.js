@@ -1,6 +1,6 @@
 const { inject } = require('powercord/injector');
 const { open: openModal } = require('powercord/modal');
-const { getOwnerInstance, waitFor } = require('powercord/util');
+const { getOwnerInstance, waitFor, forceUpdateElement } = require('powercord/util');
 const { Icons: { Info }, Tooltip } = require('powercord/components');
 const { React, Flux, getModuleByDisplayName, getModule, constants: { Routes } } = require('powercord/webpack');
 
@@ -86,7 +86,7 @@ module.exports = async function () {
   )(PrivateChannel);
 
   // Patch DM list
-  const ownerInstance = getOwnerInstance(await waitFor('.pc-privateChannels'));
+  const ownerInstance = getOwnerInstance(await waitFor('.privateChannels-1nO12o'));
   const PrivateChannelsList = ownerInstance._reactInternalFiber.return.return.child.child.child.child.memoizedProps.children[1].type;
 
   inject('bf-direct-messages', PrivateChannelsList.prototype, 'render', (args, res) => {
@@ -103,7 +103,7 @@ module.exports = async function () {
             viewBox: '0 0 20 20',
             onClick: () => {
               this.expanded = !this.expanded;
-              ownerInstance.forceUpdate();
+              forceUpdateElement('.privateChannels-1nO12o');
             }
           }, React.createElement('path', {
             fill: 'rgb(142, 146, 151)',
