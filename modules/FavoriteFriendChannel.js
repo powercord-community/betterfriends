@@ -11,6 +11,7 @@ const InformationModal = require('../components/InformationModal');
  * Creates and populates the "Favorited Friends" section on the private channel/DMs screen
  */
 module.exports = async function () {
+  this.expanded = true;
   const _this = this;
   const PrivateChannel = await getModuleByDisplayName('PrivateChannel');
   const dms = await getModule([ 'openPrivateChannel' ]);
@@ -25,7 +26,7 @@ module.exports = async function () {
   // Patch PrivateChannel
   inject('bf-direct-messages-channel', PrivateChannel.prototype, 'render', function (args, res) {
     if (this.props.isBetterFriends) {
-      res.props.children.props.children[2] = this.props.infoModal
+      res.props.children = this.props.infoModal
         ? React.createElement(Tooltip, {
           text: 'User Information',
           position: 'top'
@@ -68,6 +69,8 @@ module.exports = async function () {
         : {
           id: '0',
           type: 1,
+          isMultiUserDM: () => false,
+          recipients: [ user.id ],
           toString: () => user.username
         };
 
@@ -83,15 +86,26 @@ module.exports = async function () {
   )(PrivateChannel);
 
   // Patch DM list
-  const PrivateChannelsList = getOwnerInstance(await waitFor('.pc-privateChannels'))._reactInternalFiber.return.return.child.child.child.child.memoizedProps.children[1].type;
+  const ownerInstance = getOwnerInstance(await waitFor('.pc-privateChannels'));
+  const PrivateChannelsList = ownerInstance._reactInternalFiber.return.return.child.child.child.child.memoizedProps.children[1].type;
+
   inject('bf-direct-messages', PrivateChannelsList.prototype, 'render', (args, res) => {
     res.props.children = [
       // Previous elements
       res.props.children.slice(0, res.props.children.length - 1),
       // Header
-      this.FAV_FRIENDS.length > 0 && React.createElement('header', null, 'Favorite Friends'),
+      this.FAV_FRIENDS.length > 0 && React.createElement('header', { className: 'bf-fav-friends-header header-zu8eWb container-2ax-kl' },
+        [ 'Favorite Friends',
+          React.createElement('div', {
+            className: 'bf-expand-fav-friends',
+            onClick: () => {
+              this.expanded = !this.expanded;
+              ownerInstance.forceUpdate();
+            }
+          }, this.expanded ? 'Retract' : 'Expand') ]
+      ),
       // Friends
-      this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId })),
+      this.expanded ? this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId })) : null,
       // Previous elements
       res.props.children.slice(res.props.children.length - 1)
     ];
