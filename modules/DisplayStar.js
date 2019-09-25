@@ -12,8 +12,8 @@ module.exports = async function () {
     return;
   }
 
-  await waitFor('.pc-username');
-  await waitFor('.pc-message');
+  await waitFor('.nameAndDecorators-5FJ2dg');
+  await waitFor('.headerCozyMeta-rdohGq');
 
   const genericInjection = (res, id, inject, className = 'bf-star') => {
     if (this.FAV_FRIENDS.includes(id)) {
@@ -24,31 +24,30 @@ module.exports = async function () {
 
   const INJECT_INTO = [
     {
-      id: 'message',
-      className: '.pc-message',
+      id: 'headerCozyMeta-rdohGq',
+      className: '.headerCozyMeta-rdohGq',
       func (res, original) {
-        if (original && original.props && original.props.children[0]) {
-          const { message } = res.props;
-          const { author } = message;
-          return genericInjection(original, author.id, original.props.children[0].props.children[1].props.children);
+        if (original.props.children && original.props.children[0] && original.props.children[0].props && original.props.children[0].props.children) {
+          const { user } = original.props.children[0].props.children[0].props;
+          if (user) {
+            genericInjection(original, user.id, original.props.children[0].props.children[1].props.children);
+          }
         }
         return original;
       }
     },
     {
-      id: 'memberInner',
-      className: '.pc-memberInner',
+      id: 'nameAndDecorators-5FJ2dg',
+      className: '.member-3W1lQa > .layout-2DM8Md > .content-3QAtGj > .nameAndDecorators-5FJ2dg',
       func (res, original) {
-        const _original = original;
-        original = original.props.children;
-        if (original && original.props.children && original.props.children[1] && original.props.children[1].props.children) {
-          const { id } = original.props.children[1].props.children[0].props.children[0].props.user;
-          if (!id) {
-            return _original;
+        if (original.props.className && original.props.className.includes('member-3W1lQa') && original.props.children) {
+          const user = original.props.children.props.children[1].props.children[0].props.children[1]._owner.key ||
+          original.props.children.props.children[1].props.children[1].props.children._owner.pendingProps.user.id;
+          if (user) {
+            genericInjection(original, user, original.props.children.props.children[1].props.children[0].props.children, 'bf-star bf-star-member');
           }
-          return genericInjection(_original, id, original.props.children[1].props.children[0].props.children, 'bf-star-member');
         }
-        return _original;
+        return original;
       }
     }
   ];
