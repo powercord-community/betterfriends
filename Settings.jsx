@@ -27,7 +27,6 @@ module.exports = class Settings extends React.Component {
       Flex: await getModuleByDisplayName('Flex'),
       Text: await getModuleByDisplayName('Text'),
       PopoutList: await getModuleByDisplayName('PopoutList'),
-      FormDivider: await getModuleByDisplayName('FormDivider'),
       playSound: (await getModule([ 'playSound' ])).playSound,
       getUser: (await getModule([ 'getUser' ])).getUser,
       getRelationships: (await getModule([ 'getRelationships' ])).getRelationships
@@ -38,7 +37,7 @@ module.exports = class Settings extends React.Component {
     if (!this.state.VerticalScroller) {
       return null;
     }
-    const { VerticalScroller, Flex, Text, PopoutList, FormDivider, playSound, getUser, getRelationships } = this.state;
+    const { VerticalScroller, Flex, Text, PopoutList, playSound, getUser, getRelationships } = this.state;
     const PopoutListSearchBar = PopoutList.prototype.constructor.SearchBar;
     const PopoutListDivider = PopoutList.prototype.constructor.Divider;
     const FlexChild = Flex.prototype.constructor.Child;
@@ -111,7 +110,6 @@ module.exports = class Settings extends React.Component {
           </VerticalScroller>
         </PopoutList>
 
-        <FormDivider />
 
         <SwitchItem
           note='Toggles the functionality of the information button within the DM list on favorited friends'
