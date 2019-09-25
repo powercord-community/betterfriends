@@ -54,6 +54,17 @@
    opacity: .4;
 }
 
+.bf-fav-friends-header {
+   display: flex;
+   flex-direction: row;
+}
+
+.bf-expand-fav-friends {
+   margin-left: auto;
+   color: #4c8892;
+   cursor: pointer;
+}
+
 .bf-information:hover {
    opacity: .9;
 }
