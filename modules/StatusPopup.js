@@ -1,19 +1,8 @@
 const { inject } = require('powercord/injector');
 const { Toast } = require('powercord/components');
 const { React, ReactDOM, getModule } = require('powercord/webpack');
-const { createElement, sleep } = require('powercord/util');
+const { createElement, sleep, waitFor, getOwnerInstance } = require('powercord/util');
 const { StatusHandler } = require('./../components');
-
-const statuses = {
-  online: { friendly: 'online',
-    class: 'online-2S838R' },
-  idle: { friendly: 'idle',
-    class: 'idle-3DEnRT' },
-  dnd: { friendly: 'on do not disturb',
-    class: 'dnd-1_xrcq' },
-  offline: { friendly: 'offline',
-    class: 'offline-3qoTek' }
-};
 
 /*
  * [ Status Popup ]
@@ -24,8 +13,10 @@ module.exports = async function () {
   if (!this.settings.get('statuspopup')) {
     return;
   }
+  const avatarElement = await waitFor('.avatar-3uk_u9 > .wrapper-3t9DeA');
+  const Avatar = getOwnerInstance(avatarElement);
+  this.instances.avatar = Avatar._reactInternalFiber.child.child.child.child.child.return.child.type;
   const { getStatus } = await getModule([ 'getStatus' ]);
-  const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
   const getUser = await getModule([ 'getUser' ]);
 
   inject('bf-user', getUser, 'getUser', (args, res) => {
@@ -39,14 +30,15 @@ module.exports = async function () {
         const Notification = React.createElement(Toast, {
           header: React.createElement(StatusHandler, {
             status,
-            user: res
+            user: res,
+            Avatar: this.instances.avatar
           }),
           style: {
             bottom: '25px',
             right: '25px',
             height: 'auto',
             display: 'block',
-            padding: '20px'
+            padding: '12px'
           },
           buttons: []
         });
@@ -61,14 +53,6 @@ module.exports = async function () {
           container.remove();
         };
         render();
-
-        for (const friend of [ ...document.querySelectorAll('.channel-2QD9_O') ]) {
-          if (friend.firstChild.href.includes(getDMFromUserId(res.id))) {
-            const statusDiv = friend.querySelector('.pc-status');
-            statusDiv.classList.remove(statuses[previous].class);
-            statusDiv.classList.add(statuses[status].class);
-          }
-        }
       }
 
       this.FRIEND_DATA.statusStorage[res.id] = status;
