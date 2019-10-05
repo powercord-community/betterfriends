@@ -125,3 +125,8 @@ html body .bf-ff-header { // html body is used to get a more precise selector
       transform: rotate(90deg);
    }
 }
+
+.bf-status-userinline {
+   flex-direction: row;
+   display: flex;
+}
