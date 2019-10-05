@@ -1,14 +1,12 @@
 const { React } = require('powercord/webpack');
 const { Statuses } = require('./../Constants');
 
-module.exports = ({ status, user }) => (
+module.exports = ({ status, user, Avatar }) => (
   <div class="bf-status-popup">
-    <div style={{ float: 'left' }} class="wrapper-2F3Zv8 pc-wrapper small-5Os1Bb pc-small">
-      <div class="image-33JSyf pc-image small-5Os1Bb pc-small mask-3OgeRz pc-mask" style={{ backgroundImage: `url(${user.avatarURL})` }} />
-      <div class={`pc-${status} ${Statuses[status].class} status-oxiHuE pc-status small-5Os1Bb pc-small animate-iYrs3- pc-animate statusAnimated-1SvwJ- statusStatic-3QpK4G status-2s6iDp pc-statusAnimated`} />
+    <div class='bf-status-userinline'>
+      <Avatar src={user.avatarURL} status={status} size='SIZE_32' statusTooltip={true} />
+      <div style={{ marginLeft: '8px',
+        marginTop: '8px' }} class="bf-status-popup-text">{user.username} is now {Statuses[status].friendly}.</div>
     </div>
-    <div style={{ float: 'right',
-      marginLeft: '14px',
-      marginTop: '8px' }} class="bf-status-popup-text">{user.username} is now {Statuses[status].friendly}.</div>
   </div>
 );
