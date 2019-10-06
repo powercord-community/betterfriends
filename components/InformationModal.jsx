@@ -66,8 +66,9 @@ module.exports = class InformationModal extends React.Component {
             const guild = getGuild(channel.guild_id);
             const timestamp = extractTimestamp(this.props.message);
             return (<div className='text-2F8PnX marginBottom20-32qID7 primary-jw0I4K'>{username} was last seen in {guild
-              ? `#${channel.name} (${guild.name})`
-              : 'your DMs'} around {this.parse((Date.now() - timestamp) / 1000)} ago</div>);
+              ? <span><span className='wrapperHover-1GktnT wrapper-3WhCwL'>#{channel.name}</span> ({guild.name})</span>
+              : channel.recipients.length <= 2 ? 'your DMs' : <span className='wrapperHover-1GktnT wrapper-3WhCwL'>{channel.name}</span>
+            } around {this.parse((Date.now() - timestamp) / 1000)} ago</div>);
           })()}
         </div>
       </Confirm>
