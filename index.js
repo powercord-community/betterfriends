@@ -23,6 +23,7 @@ module.exports = class BetterFriends extends Plugin {
       displaystar: true,
       statuspopup: true
     };
+    this.instances = {};
     this.FAV_FRIENDS = this.settings.get('favfriends');
     if (!this.FAV_FRIENDS) {
       this.FAV_FRIENDS = [];
