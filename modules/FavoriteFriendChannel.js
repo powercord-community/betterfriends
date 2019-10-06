@@ -63,7 +63,10 @@ module.exports = async function () {
     [ userStore, channelStore, activityStore, statusStore, powercord.api.settings.store ],
     ({ userId }) => {
       const channelId = channelStore.getDMFromUserId(userId);
-      const user = userStore.getUser(userId);
+      const user = userStore.getUser(userId) || { id: '0',
+        username: '???',
+        getAvatarURL: () => null };
+
       const channel = channelId
         ? channelStore.getChannel(channelId)
         : {
