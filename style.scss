@@ -130,3 +130,7 @@ html body .bf-ff-header { // html body is used to get a more precise selector
    flex-direction: row;
    display: flex;
 }
+
+.bf-status-popup {
+   height: fit-content;
+}
