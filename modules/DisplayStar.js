@@ -38,13 +38,12 @@ module.exports = async function () {
     },
     {
       id: 'nameAndDecorators-5FJ2dg',
-      className: '.member-3W1lQa > .layout-2DM8Md > .content-3QAtGj > .nameAndDecorators-5FJ2dg',
+      className: '.member-3-YXUe > .layout-2DM8Md > .content-3QAtGj > .nameAndDecorators-5FJ2dg',
       func (res, original) {
-        if (original.props.className && original.props.className.includes('member-3W1lQa') && original.props.children) {
-          const user = original.props.children.props.children[1].props.children[0].props.children[1]._owner.key ||
-          original.props.children.props.children[1].props.children[1].props.children._owner.pendingProps.user.id;
+        if (original.props.className && original.props.className.includes('member-3-YXUe') && original.props.children) {
+          const user = original.props.children.props.children[1].props.children[0].props.children[1]._owner.pendingProps.user.id;
           if (user) {
-            genericInjection(original, user, original.props.children.props.children[1].props.children[0].props.children, 'bf-star bf-star-member');
+            genericInjection(original, user, original.props.children.props.children[1].props.children[0].props.children[1].props.children, 'bf-star bf-star-member');
           }
         }
         return original;
