@@ -105,6 +105,7 @@ module.exports = class BetterFriends extends Plugin {
       }
     } else {
       this.log('Plugin stopped');
+      document.removeEventListener('click', this.clickListener);
       for (const unload of Object.keys(this.MODULES)) {
         for (const injection of (InjectionIDs[unload] || [])) {
           uninject(injection);
@@ -123,7 +124,6 @@ module.exports = class BetterFriends extends Plugin {
    * @param {String} specific Pass a specific module name to reload only that module
    */
   async reload (...specific) {
-    console.log('test', specific);
     if (specific && specific.length) {
       for (const mod of specific) {
         this.log(`Reloading module '${mod}'`);
