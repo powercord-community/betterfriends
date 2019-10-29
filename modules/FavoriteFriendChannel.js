@@ -23,6 +23,28 @@ module.exports = async function () {
   const { lastMessageId } = await getModule([ 'lastMessageId' ]);
   const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
 
+  this.clickListener = (event) => {
+    let el = event.target;
+    const setElement = () => {
+      do {
+        if (el.matches('.channel-2QD9_O')) {
+          return el;
+        }
+        el = el.parentElement || el.parentNode;
+      } while (el !== null && el.nodeType === 1);
+    };
+    setElement();
+
+    for (const elm of [ ...document.querySelectorAll('.selected-aXhQR6') ]) {
+      elm.classList.remove('selected-aXhQR6');
+    }
+    if (el && el.classList && !el.classList.contains('selected-aXhQR6')) {
+      el.classList.add('selected-aXhQR6');
+    }
+  };
+
+  document.addEventListener('click', this.clickListener);
+
   // Patch PrivateChannel
   inject('bf-direct-messages-channel', PrivateChannel.prototype, 'render', function (args, res) {
     if (this.props.isBetterFriends) {
