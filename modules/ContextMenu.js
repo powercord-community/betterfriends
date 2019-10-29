@@ -17,31 +17,32 @@ module.exports = async function () {
   };
   const isFavoriteFriend = (id) => this.FAV_FRIENDS.includes(id);
   inject('bf-contextmenu-listener', UserContextMenu.prototype, 'render', (args, res) => {
-    this.log(res);
     const id = res.props.children.props.children.props.children[0].props.children[0].props.userId;
     if (isFriend(id)) {
-      if (!isFavoriteFriend(id)) {
+      if (!isFavoriteFriend(id) && res.props.children.props.children.props.children[1].props.children) {
         res.props.children.props.children.props.children[1].props.children.splice(4, 0,
           React.createElement(Button, {
             name: 'Add as Favorite',
             onClick: () => {
               this.FAV_FRIENDS.push(id);
               this.settings.set('favfriends', this.FAV_FRIENDS);
-              this.reload('FavoriteFriendChannel', 'FavoriteFriendsSection');
+              this.reload();
             }
           })
         );
       } else {
-        res.props.children.props.children.props.children[1].props.children.splice(4, 0,
-          React.createElement(Button, {
-            name: 'Remove from Favorites',
-            onClick: () => {
-              this.FAV_FRIENDS = this.FAV_FRIENDS.filter(a => a !== id);
-              this.settings.set('favfriends', this.FAV_FRIENDS);
-              this.reload('FavoriteFriendChannel', 'FavoriteFriendsSection', 'DisplayStar');
-            }
-          })
-        );
+        if (res.props.children.props.children.props.children[1].props.children) {
+          res.props.children.props.children.props.children[1].props.children.splice(4, 0,
+            React.createElement(Button, {
+              name: 'Remove from Favorites',
+              onClick: () => {
+                this.FAV_FRIENDS = this.FAV_FRIENDS.filter(a => a !== id);
+                this.settings.set('favfriends', this.FAV_FRIENDS);
+                this.reload();
+              }
+            })
+          );
+        }
       }
     }
     return res;

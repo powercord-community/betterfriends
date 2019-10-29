@@ -11,6 +11,7 @@ module.exports = async function () {
   try {
     const typingModule = require.resolve(resolve(`${__dirname}/../../channel-typing/index.js`));
     const typingStore = await getModule([ 'getTypingUsers' ]);
+
     inject('bf-ct-integration', require.cache[typingModule].exports.prototype, '_renderTypingElement', (args, res) => {
       if (this.FAV_FRIENDS.some(fr => Object.keys(typingStore.getTypingUsers(args[0].id)).includes(fr))) {
         res.props.style.filter = 'sepia(300%) hue-rotate(313deg) saturate(1600%)';
