@@ -52,6 +52,7 @@ module.exports = async function () {
           const channelId = await dms.openPrivateChannel(userStore.getCurrentUser().id, this.props.user.id);
           // eslint-disable-next-line new-cap
           transition.transitionTo(Routes.CHANNEL('@me', channelId));
+          forceUpdateElement('.privateChannels-1nO12o');
         };
       }
     }
@@ -93,6 +94,12 @@ module.exports = async function () {
   const PrivateChannelsList = ownerInstance._reactInternalFiber.return.return.child.child.child.child.memoizedProps.children[1].type;
 
   inject('bf-direct-messages', PrivateChannelsList.prototype, 'render', (args, res) => {
+    res.props.privateChannelIds = res.props.privateChannelIds
+      .filter(c => {
+        const channel = channelStore.getChannel(c);
+        return channel.type !== 1 || !this.FAV_FRIENDS.includes(channel.recipients[0]);
+      });
+
     res.props.children = [
       // Previous elements
       res.props.children.slice(0, res.props.children.length - 1),
@@ -115,17 +122,17 @@ module.exports = async function () {
           ) ]
       ),
       // Friends
-      this.expanded ? this.FAV_FRIENDS.map(userId => React.createElement(ConnectedPrivateChannel, { userId })) : null,
+      this.expanded
+        ? this.FAV_FRIENDS
+          .sort((a, b) => lastMessageId(getDMFromUserId(b)) - lastMessageId(getDMFromUserId(a)))
+          .map(userId => React.createElement(ConnectedPrivateChannel, { userId }))
+        : null,
       // Previous elements
       res.props.children.slice(res.props.children.length - 1)
     ];
-    this.FAV_FRIENDS.sort((a, b) => lastMessageId(getDMFromUserId(b)) - lastMessageId(getDMFromUserId(a)));
-    res.props.privateChannelIds = res.props.privateChannelIds
-      .filter(c => {
-        const channel = channelStore.getChannel(c);
-        return channel.type !== 1 || !this.FAV_FRIENDS.includes(channel.recipients[0]);
-      });
 
     return res;
   });
+
+  forceUpdateElement('.privateChannels-1nO12o');
 };
