@@ -10,24 +10,26 @@ const { resolve } = require('path');
  */
 module.exports = async function () {
   const { getUser } = await getModule([ 'getUser' ]);
-  const { getPrimaryActivity } = await getModule([ 'getPrimaryActivity' ]);
+  const { getActivities } = await getModule([ 'getActivities' ]);
   const { sync } = await getModule([ 'sync', 'stopSyncing' ]);
 
   await waitFor('.powercord-spotify');
   this.log('Injecting into pc-spotify context menu (integration with pc-spotify)');
 
   const isListeningToSpotify = (id) => {
-    const activity = getPrimaryActivity(id);
-    if (activity && activity.name === 'Spotify') {
-      return true;
+    const activity = getActivities(id);
+    const spotify = activity.find(a => a.name === 'Spotify' && a.type === 2);
+    if (spotify) {
+      return spotify;
     }
     return false;
   };
 
   const spotifyModule = require.resolve(resolve(`${__dirname}./../../pc-spotify/Modal/contextMenuGroups.js`));
+
   if (spotifyModule) {
     inject('bf-spotify-integration', require.cache[spotifyModule], 'exports', (args, res) => {
-      const spotifyFriends = this.FAV_FRIENDS.filter(isListeningToSpotify);
+      const spotifyFriends = this.FAV_FRIENDS.filter(c => isListeningToSpotify(c));
       if (spotifyFriends.length) {
         res.unshift(
           [ {
@@ -39,7 +41,7 @@ module.exports = async function () {
                 type: 'button',
                 name: user.username,
                 hint: '🎧',
-                onClick: () => sync(getPrimaryActivity(user.id), user.id)
+                onClick: () => sync(isListeningToSpotify(user.id), user.id)
               }))
           } ]
         );
