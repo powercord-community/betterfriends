@@ -1,6 +1,7 @@
 const { Plugin } = require('powercord/entities');
 const { uninject } = require('powercord/injector');
 const { React } = require('powercord/webpack');
+const { forceUpdateElement } = require('powercord/util');
 const { resolve } = require('path');
 const Settings = require('./Settings');
 const { InjectionIDs } = require('./Constants');
@@ -11,10 +12,6 @@ module.exports = class BetterFriends extends Plugin {
    * Start the plugin
    */
   async startPlugin () {
-    await this.start();
-  }
-
-  start () {
     // Default settings handler
     this.DEFAULT_SETTINGS = {
       favfriends: [],
@@ -22,22 +19,6 @@ module.exports = class BetterFriends extends Plugin {
       infomodal: true,
       displaystar: true,
       statuspopup: true
-    };
-    this.instances = {};
-    this.FAV_FRIENDS = this.settings.get('favfriends');
-    if (!this.FAV_FRIENDS) {
-      this.FAV_FRIENDS = [];
-      for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
-        if (this.DEFAULT_SETTINGS[setting] === undefined && !this.FAV_FRIENDS) { /* eslint-disable-line */ /* I know this is bad practice, hopefully I'll find a better solution soon */
-          this.settings.set(this.settings.get(setting, this.DEFAULT_SETTINGS[setting]));
-        }
-      }
-    }
-
-    // Constants
-    this.FRIEND_DATA = {
-      statusStorage: {},
-      lastMessageID: {}
     };
 
     // Register settings menu for BetterFriends
@@ -53,6 +34,27 @@ module.exports = class BetterFriends extends Plugin {
     // Handle CSS
     this.loadCSS(resolve(__dirname, 'style.scss'));
 
+    // Constants
+    this.FRIEND_DATA = {
+      statusStorage: {},
+      lastMessageID: {}
+    };
+
+    await this.start();
+  }
+
+  async start () {
+    this.instances = {};
+    this.FAV_FRIENDS = this.settings.get('favfriends');
+    if (!this.FAV_FRIENDS) {
+      this.FAV_FRIENDS = [];
+      for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
+        if (this.DEFAULT_SETTINGS[setting] === undefined && !this.FAV_FRIENDS) { /* eslint-disable-line */ /* I know this is bad practice, hopefully I'll find a better solution soon */
+          this.settings.set(this.settings.get(setting, this.DEFAULT_SETTINGS[setting]));
+        }
+      }
+    }
+
     /*
      * Modules
      * Handled by the module resolver outside of `startPlugin`.
@@ -67,7 +69,7 @@ module.exports = class BetterFriends extends Plugin {
 
     // Unload all modules if this user has no favorite friends
     if (this.FAV_FRIENDS && this.FAV_FRIENDS.length > 0) {
-      this.load();
+      await this.load();
     }
   }
 
@@ -120,8 +122,9 @@ module.exports = class BetterFriends extends Plugin {
    * When no module is specified, the entire plugin will reload
    * @param {String} specific Pass a specific module name to reload only that module
    */
-  reload (...specific) {
-    if (specific) {
+  async reload (...specific) {
+    console.log('test', specific);
+    if (specific && specific.length) {
       for (const mod of specific) {
         this.log(`Reloading module '${mod}'`);
         this.unload(mod);
@@ -130,7 +133,8 @@ module.exports = class BetterFriends extends Plugin {
     } else {
       this.log('Reloading all modules');
       this.unload();
-      this.startPlugin();
+      await this.start();
+      forceUpdateElement('.privateChannels-1nO12o');
     }
   }
 
