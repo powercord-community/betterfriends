@@ -79,6 +79,7 @@ module.exports = class Settings extends React.Component {
                   } else {
                     this._set('favfriends', this.state.favfriends.filter(a => a !== e.id));
                   }
+                  this.plugin.reload();
                 }}>
                   <Flex align='alignCenter-1dQNNs' basis='auto' grow={1} shrink={1}>
                     <div>
@@ -138,7 +139,7 @@ module.exports = class Settings extends React.Component {
           value={this.state.statuspopup}
           onChange={() => {
             this._set('statuspopup');
-            this.plugin.reload('StatusPopup');
+            this.plugin.reload();
           }}
         >
           Show status notifications
