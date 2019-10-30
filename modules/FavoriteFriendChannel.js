@@ -28,6 +28,9 @@ module.exports = async function () {
     const setElement = () => {
       do {
         if (el.matches('.channel-2QD9_O')) {
+          for (const elm of [ ...document.querySelectorAll('.selected-aXhQR6') ]) {
+            elm.classList.remove('selected-aXhQR6');
+          }
           return el;
         }
         el = el.parentElement || el.parentNode;
@@ -35,9 +38,6 @@ module.exports = async function () {
     };
     setElement();
 
-    for (const elm of [ ...document.querySelectorAll('.selected-aXhQR6') ]) {
-      elm.classList.remove('selected-aXhQR6');
-    }
     if (el && el.classList && !el.classList.contains('selected-aXhQR6')) {
       el.classList.add('selected-aXhQR6');
     }
