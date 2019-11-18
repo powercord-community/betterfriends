@@ -67,7 +67,7 @@ module.exports = async function () {
         }))
         : null;
 
-      if (this.props.channel.id === '0') {
+      if (this.props.channel.id === '0' && res.props.children) {
         res.props.onMouseDown = () => void 0;
         res.props.children = React.createElement('a', null, res.props.children.props.children);
         res.props.onClick = async () => {
