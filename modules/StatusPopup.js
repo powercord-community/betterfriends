@@ -17,7 +17,7 @@ module.exports = async function () {
   const Avatar = getOwnerInstance(avatarElement);
   this.instances.avatar = Avatar._reactInternalFiber.child.child.child.child.child.return.child.type;
   const { getStatus } = await getModule([ 'getStatus' ]);
-  const getUser = await getModule([ 'getUser' ]);
+  const getUser = await getModule([ 'getUser', 'getCurrentUser' ]);
 
   inject('bf-user', getUser, 'getUser', (args, res) => {
     if (res && this.FAV_FRIENDS.includes(res.id)) {

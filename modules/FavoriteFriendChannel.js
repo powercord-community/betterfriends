@@ -16,7 +16,7 @@ module.exports = async function () {
   const PrivateChannel = await getModuleByDisplayName('PrivateChannel');
   const dms = await getModule([ 'openPrivateChannel' ]);
   const transition = await getModule([ 'transitionTo' ]);
-  const userStore = await getModule([ 'getUser' ]);
+  const userStore = await getModule([ 'getUser', 'getCurrentUser' ]);
   const channelStore = await getModule([ 'getChannel', 'getDMFromUserId' ]);
   const activityStore = await getModule([ 'getPrimaryActivity' ]);
   const statusStore = await getModule([ 'getStatus' ]);
@@ -67,7 +67,7 @@ module.exports = async function () {
         }))
         : null;
 
-      if (this.props.channel.id === '0') {
+      if (this.props.channel.id === '0' && res.props.children) {
         res.props.onMouseDown = () => void 0;
         res.props.children = React.createElement('a', null, res.props.children.props.children);
         res.props.onClick = async () => {
