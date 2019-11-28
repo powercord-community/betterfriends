@@ -1,7 +1,7 @@
 const { inject } = require('powercord/injector');
 const { open: openModal } = require('powercord/modal');
 const { getOwnerInstance, waitFor, forceUpdateElement } = require('powercord/util');
-const { Icons: { Info }, Tooltip } = require('powercord/components');
+const { Icons: { Keyboard }, Tooltip } = require('powercord/components');
 const { React, Flux, getModuleByDisplayName, getModule, constants: { Routes } } = require('powercord/webpack');
 
 const InformationModal = require('../components/InformationModal');
@@ -52,20 +52,23 @@ module.exports = async function () {
         ? React.createElement(Tooltip, {
           text: 'User Information',
           position: 'top'
-        }, React.createElement(Info, {
+        }, React.createElement(Keyboard, {
           className: 'bf-information',
           onClick: e => {
             e.stopPropagation();
             e.preventDefault();
             const info = _this.FRIEND_DATA.lastMessageID[this.props.user.id];
             openModal(() => React.createElement(InformationModal, {
-              user: this.props.user,
+              user: { ...this.props.user,
+                isSystemUser: () => false,
+                isSystemDM: () => false
+              },
               channel: !info ? 'nothing' : info.channel,
               message: !info ? 'nothing' : info.id
             }));
           }
         }))
-        : null;
+        : React.createElement('p');
 
       if (this.props.channel.id === '0' && res.props.children) {
         res.props.onMouseDown = () => void 0;
@@ -88,7 +91,10 @@ module.exports = async function () {
       const channelId = channelStore.getDMFromUserId(userId);
       const user = userStore.getUser(userId) || { id: '0',
         username: '???',
-        getAvatarURL: () => null };
+        isSystemUser: () => false,
+        getAvatarURL: () => null,
+        isSystemDM: () => false
+      };
 
       const channel = channelId
         ? channelStore.getChannel(channelId)
@@ -96,6 +102,8 @@ module.exports = async function () {
           id: '0',
           type: 1,
           isMultiUserDM: () => false,
+          isSystemUser: () => false,
+          isSystemDM: () => false,
           recipients: [ user.id ],
           toString: () => user.username
         };
