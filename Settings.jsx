@@ -28,7 +28,7 @@ module.exports = class Settings extends React.Component {
       Text: await getModuleByDisplayName('Text'),
       PopoutList: await getModuleByDisplayName('PopoutList'),
       playSound: (await getModule([ 'playSound' ])).playSound,
-      getUser: (await getModule([ 'getUser' ])).getUser,
+      getUser: (await getModule([ 'getUser', 'getUsers' ])).getUser,
       getRelationships: (await getModule([ 'getRelationships' ])).getRelationships
     });
   }
