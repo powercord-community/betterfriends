@@ -1,5 +1,5 @@
 const { inject } = require('powercord/injector');
-const { Toast } = require('powercord/components');
+const Toast = require('./../../pc-notices/components/Toast');
 const { React, ReactDOM, getModule } = require('powercord/webpack');
 const { createElement, sleep, waitFor, getOwnerInstance } = require('powercord/util');
 const { StatusHandler } = require('./../components');
@@ -27,6 +27,7 @@ module.exports = async function () {
         this.log('Showing notification');
         const container = createElement('div', { id: 'bf-friend-status-popup' });
         document.body.appendChild(container);
+        console.log(Toast)
         const Notification = React.createElement(Toast, {
           header: React.createElement(StatusHandler, {
             status,
