@@ -88,8 +88,9 @@ module.exports = async function () {
   // Build connected component
   const ConnectedPrivateChannel = Flux.connectStores(
     [ userStore, channelStore, activityStore, statusStore, powercord.api.settings.store ],
-    ({ userId }) => {
+    ({ userId, currentSelectedChannel }) => {
       const channelId = channelStore.getDMFromUserId(userId);
+      const selected = currentSelectedChannel === channelId;
       const user = userStore.getUser(userId) || { id: '0',
         username: '???',
         isSystemUser: () => false,
@@ -112,6 +113,7 @@ module.exports = async function () {
       return {
         user,
         channel,
+        selected,
         status: statusStore.getStatus(userId),
         activity: activityStore.getPrimaryActivity(userId),
         infoModal: powercord.api.settings.store.getSetting('betterfriends', 'infomodal'),
@@ -154,7 +156,7 @@ module.exports = async function () {
       this.expanded
         ? () => this.FAV_FRIENDS
           .sort((a, b) => lastMessageId(getDMFromUserId(b)) - lastMessageId(getDMFromUserId(a)))
-          .map(userId => React.createElement(ConnectedPrivateChannel, { userId }))
+          .map(userId => React.createElement(ConnectedPrivateChannel, { userId, currentSelectedChannel: res.props.selectedChannelId }))
         : null
     ];
 
