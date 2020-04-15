@@ -1,8 +1,8 @@
 {
   "name": "Better Friends",
-  "version": "3.2.1",
+  "version": "3.4.0",
   "description": "Improves Discord's friend feature in a multitude of ways",
-  "author": "Nevulo#0007",
+  "author": "Nevulo",
   "license": "Apache-2.0",
   "optionalDependencies": [
     "pc-spotify",
