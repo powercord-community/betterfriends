@@ -11,7 +11,7 @@ const { resolve } = require('path');
 module.exports = async function () {
   const { getUser } = await getModule([ 'getUser' ]);
   const { getActivities } = await getModule([ 'getActivities' ]);
-  const { sync } = await getModule([ 'sync', 'stopSyncing' ]);
+  const { sync } = await getModule([ 'sync' ]);
 
   await waitFor('.powercord-spotify');
   this.log('Injecting into pc-spotify context menu (integration with pc-spotify)');
