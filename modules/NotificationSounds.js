@@ -1,14 +1,18 @@
 const { getModule } = require('powercord/webpack');
-// Need to switch from Constants to settings file, where each Discord sound ID (ie. message1) is mapped to an mp3 link
-const { Sounds } = require('./../Constants');
+const { inject } = require('powercord/injector');
 
 /*
  * [ Notification Sounds ]
  * Handles custom notification sounds
  */
 module.exports = async function () {
+  let doPlayCustomSound = false;
   const playSound = await getModule([ 'playSound' ]);
+  const { getCurrentUser } = await getModule([ 'getCurrentUser' ]);
+  const makeTextChatNotification = await getModule([ 'makeTextChatNotification' ]);
+
   const custom = this.settings.get('notifsounds', {});
+  const isFavoriteFriend = (id) => this.FAV_FRIENDS.includes(id);
 
   const AUDIO = Object.keys(custom).map(s => {
     const sound = custom[s];
@@ -26,17 +30,30 @@ module.exports = async function () {
       const audio = new Audio();
       audio.pause();
       audio.src = custom[type].url;
-      audio.volume = custom[type].volume;
+      audio.volume = 0.1 || custom[type].volume;
       audio.play();
     }
   };
 
   // Overwrite the original `playSound` function
   playSound.playSound = function (e) {
-    if (!Sounds[e] || (!custom[e] || !custom[e].url)) {
+    if (!doPlayCustomSound) {
       playSound.createSound(e).play();
     } else {
       play(e);
+      if (doPlayCustomSound) doPlayCustomSound = false;
     }
   };
+
+  inject('bf-notification', makeTextChatNotification, 'makeTextChatNotification', (args, res) => {
+    const self = getCurrentUser();
+    const message = args[1];
+    if (self.id !== message.author.id) {
+      if (isFavoriteFriend(message.author.id)) {
+        this.log('Playing custom sound for favorited friend')
+        doPlayCustomSound = true;
+      }
+    }
+    return res;
+  });
 };
