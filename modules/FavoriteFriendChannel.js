@@ -1,6 +1,6 @@
 const { inject } = require('powercord/injector');
 const { open: openModal } = require('powercord/modal');
-const { getOwnerInstance, waitFor, forceUpdateElement, sleep } = require('powercord/util');
+const { forceUpdateElement, sleep } = require('powercord/util');
 const { Icons: { Keyboard }, Tooltip } = require('powercord/components');
 const { React, Flux, getModuleByDisplayName, getModule, constants: { Routes } } = require('powercord/webpack');
 
@@ -23,14 +23,20 @@ module.exports = async function () {
   const statusStore = await getModule([ 'getStatus' ]);
   const { lastMessageId } = await getModule([ 'lastMessageId' ]);
   const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
+  const classes = {
+    ...await getModule([ 'privateChannels' ]),
+    ...await getModule([ 'channel', 'closeButton' ]),
+    ...await getModule([ 'avatar', 'muted', 'selected' ]),
+    ...await getModule([ 'privateChannelsHeaderContainer' ])
+  }
 
   this.clickListener = (event) => {
     let el = event.target;
     const setElement = () => {
       do {
-        if (el.matches('.channel-2QD9_O')) {
-          for (const elm of [ ...document.querySelectorAll('.selected-aXhQR6') ]) {
-            elm.classList.remove('selected-aXhQR6');
+        if (el.matches('.' + classes.channel)) {
+          for (const elm of [ ...document.querySelectorAll('.' + classes.selected) ]) {
+            elm.classList.remove(classes.selected);
           }
           return el;
         }
@@ -39,8 +45,8 @@ module.exports = async function () {
     };
     setElement();
 
-    if (el && el.classList && !el.classList.contains('selected-aXhQR6')) {
-      el.classList.add('selected-aXhQR6');
+    if (el && el.classList && !el.classList.contains(classes.selected)) {
+      el.classList.add(classes.selected);
     }
   };
 
@@ -78,7 +84,7 @@ module.exports = async function () {
           const channelId = await dms.openPrivateChannel(userStore.getCurrentUser().id, this.props.user.id);
           // eslint-disable-next-line new-cap
           transition.transitionTo(Routes.CHANNEL('@me', channelId));
-          forceUpdateElement('.privateChannels-1nO12o');
+          forceUpdateElement('.' + classes.privateChannels);
         };
       }
     }
@@ -134,8 +140,8 @@ module.exports = async function () {
       // Previous elements
       ...res.props.children,
       // Header
-      this.FAV_FRIENDS.length > 0 && (() => React.createElement('h2', { className: 'bf-fav-friends-header privateChannelsHeaderContainer-3NB1K1 container-2ax-kl' },
-        [ React.createElement('span', { className: 'headerText-2F0828' }, 'Favorite Friends'),
+      this.FAV_FRIENDS.length > 0 && (() => React.createElement('h2', { className: `bf-fav-friends-header ${classes.privateChannelsHeaderContainer} container-2ax-kl` },
+        [ React.createElement('span', { className: classes.headerText }, 'Favorite Friends'),
           React.createElement('svg', {
             className: `bf-expand-fav-friends ${this.expanded ? 'expanded' : 'collapsed'}`,
             height: 15,
@@ -144,7 +150,7 @@ module.exports = async function () {
             onClick: async () => {
               this.expanded = !this.expanded;
               await sleep(10);
-              forceUpdateElement('.privateChannels-1nO12o');
+              forceUpdateElement('.' + classes.privateChannels);
             }
           }, React.createElement('path', {
             fill: 'rgb(185, 187, 190)',
@@ -162,6 +168,7 @@ module.exports = async function () {
 
     return res;
   });
+  ConnectedPrivateChannelsList.default.displayName = 'ConnectedPrivateChannelsList';
 
-  forceUpdateElement('.privateChannels-1nO12o');
+  forceUpdateElement('.' + classes.privateChannels);
 };

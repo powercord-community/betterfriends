@@ -1,7 +1,6 @@
 const { inject } = require('powercord/injector');
-const Toast = require('./../../pc-notices/components/Toast');
-const { React, ReactDOM, getModule } = require('powercord/webpack');
-const { createElement, sleep, waitFor, getOwnerInstance } = require('powercord/util');
+const { React, getModule } = require('powercord/webpack');
+const { waitFor, getOwnerInstance } = require('powercord/util');
 const { StatusHandler } = require('./../components');
 
 const FRIENDLY_STATEMENT = {
@@ -17,12 +16,17 @@ const FRIENDLY_STATEMENT = {
  * Contributors: aetheryx#0001
  */
 module.exports = async function () {
-  if (!this.settings.get('statuspopup')) {
-    return;
+  if (!this.settings.get('statuspopup', true)) return;
+  const classes = {
+    ...await getModule([ 'avatar', 'wrapper' ]),
+    ...await getModule([ 'avatar', 'muted', 'selected' ])
   }
-  const avatarElement = await waitFor('.avatar-3uk_u9 > .wrapper-3t9DeA');
+  const avatarElement = await waitFor(`.${classes.avatar} > .${classes.wrapper}`);
   const Avatar = getOwnerInstance(avatarElement);
+  // it can be better i think
   this.instances.avatar = Avatar._reactInternalFiber.child.child.child.child.child.return.child.type;
+  if (this.instances.avatar === 'a')
+    this.instances.avatar = Avatar._reactInternalFiber.child.return.child.child.child.child.child.child.child.child.child.type;
   const { getStatus } = await getModule([ 'getStatus' ]);
   const getUser = await getModule([ 'getUser', 'getCurrentUser' ]);
 
