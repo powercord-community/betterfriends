@@ -34,16 +34,30 @@
 
 .bf-star {
    display: inline;
-   margin-left: 4px;
-   padding-left: 12px;
+   position: relative;
+   top: 0px;
+   padding-left: 1em;
    background: url('https://canary.discordapp.com/assets/e4d52f4d69d7bba67e5fd70ffe26b70d.svg') 50% no-repeat;
-   background-size: 9px 9px;
-   &.bf-star-member {
-      width: 9px;
-      height: 9px;
-      padding-left: 6px;
+   background-size: 10px 10px;
+
+   &-member {
+      margin-left: 4px;
    }
 }
+
+.bf-badge, .bf-badge.topSectionNormal-2-vo2m {
+   background: none;
+   display: inline;
+ }
+ 
+ .bf-badge ~ .botTagRegular-2HEhHi {
+   margin-left: 8px;
+ }
+ 
+ .privateChannels-1nO12o .bf-badge, .badges > .bf-badge {
+   height: 20px !important;
+   width: auto !important;
+ }
 
 .bf-information {
    width: 15px;
