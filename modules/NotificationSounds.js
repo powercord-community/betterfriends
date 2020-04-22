@@ -37,7 +37,7 @@ module.exports = async function () {
 
   // Overwrite the original `playSound` function
   playSound.playSound = function (e) {
-    if (!doPlayCustomSound) {
+    if (!doPlayCustomSound || !custom[e]) {
       playSound.createSound(e).play();
     } else {
       play(e);
