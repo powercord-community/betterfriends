@@ -4,6 +4,13 @@ const { React, ReactDOM, getModule } = require('powercord/webpack');
 const { createElement, sleep, waitFor, getOwnerInstance } = require('powercord/util');
 const { StatusHandler } = require('./../components');
 
+const FRIENDLY_STATEMENT = {
+  online: 'went online',
+  offline: 'went offline',
+  dnd: 'went in to do not disturb',
+  idle: 'went idle'
+}
+
 /*
  * [ Status Popup ]
  * Listens for status changes from favorited friends, stores them and displays a little notification.
@@ -25,15 +32,15 @@ module.exports = async function () {
       const previous = this.FRIEND_DATA.statusStorage[res.id];
       if (previous && status !== previous) {
         this.log('Showing notification');
-        const container = createElement('div', { id: 'bf-friend-status-popup' });
-        document.body.appendChild(container);
-        console.log(Toast)
-        const Notification = React.createElement(Toast, {
-          header: React.createElement(StatusHandler, {
+        powercord.api.notices.sendToast(`bf-friend-notification-${Math.random() * 100}`, {
+          icon: false,
+          header: `Friend ${FRIENDLY_STATEMENT[status]}`,
+          content: React.createElement(StatusHandler, {
             status,
             user: res,
             Avatar: this.instances.avatar
           }),
+          timeout: 5000,
           style: {
             bottom: '25px',
             right: '25px',
@@ -43,17 +50,6 @@ module.exports = async function () {
           },
           buttons: []
         });
-        // this.statusPopupInstance.forceUpdate();
-        const render = async () => {
-          const NotificationRenderer = ReactDOM.render(Notification, container);
-          if (Notification && NotificationRenderer) {
-            await sleep(3500);
-            NotificationRenderer.setState({ leaving: true });
-            await sleep(500);
-          }
-          container.remove();
-        };
-        render();
       }
 
       this.FRIEND_DATA.statusStorage[res.id] = status;
