@@ -1,5 +1,4 @@
-const { waitFor, getOwnerInstance } = require('powercord/util');
-const { React } = require('powercord/webpack');
+const { React, getModule, getModuleByDisplayName } = require('powercord/webpack');
 const { inject } = require('powercord/injector');
 const { Star } = require('./../components');
 
@@ -11,57 +10,40 @@ module.exports = async function () {
   if (!this.settings.get('displaystar', true)) {
     return;
   }
+  const classes = await getModule([ 'profileBadgeStaff' ]);
+  const isFavoriteFriend = (id) => this.FAV_FRIENDS.includes(id);
 
-  await waitFor('.nameAndDecorators-5FJ2dg');
-  await waitFor('.headerCozyMeta-rdohGq');
-
-  const genericInjection = (res, id, inject, className = 'bf-star') => {
-    if (this.FAV_FRIENDS.includes(id)) {
-      inject.splice(1, 0, React.createElement(Star, { className }));
-    }
-    return res;
-  };
-
-  const INJECT_INTO = [
-    {
-      id: 'headerCozyMeta-rdohGq',
-      className: '.headerCozyMeta-rdohGq',
-      func (res, original) {
-        if (original.props.children && original.props.children[0] && original.props.children[0].props && original.props.children[0].props.children) {
-          const { user } = original.props.children[0].props.children[0].props;
-          if (user) {
-            genericInjection(original, user.id, original.props.children[0].props.children[1].props.children);
-          }
-        }
-        return original;
-      }
-    },
-    {
-      id: 'nameAndDecorators-5FJ2dg',
-      className: '.member-3-YXUe > .layout-2DM8Md > .content-3QAtGj > .nameAndDecorators-5FJ2dg',
-      func (res, original) {
-        if (original.props.className && original.props.className.includes('member-3-YXUe') && original.props.children) {
-          const user = original.props.children.props.children[1].props.children[0].props.children[1]._owner.pendingProps.user.id;
-          if (user) {
-            genericInjection(original, user, original.props.children.props.children[1].props.children[0].props.children[1].props.children, 'bf-star bf-star-member');
-          }
-        }
-        return original;
-      }
-    }
-  ];
-
-  for (const injection of INJECT_INTO) {
-    const { id, className, func } = injection;
-    await waitFor(className);
-    const selector = document.querySelector(className);
-    const updateInstance = () =>
-      (this.instance = getOwnerInstance(selector));
-    const instancePrototype = Object.getPrototypeOf(updateInstance());
-    updateInstance();
-
-    inject(`bf-star-${id}`, instancePrototype, 'render', function (_, res) {
-      return func(this, res);
-    });
+  /**
+   * Thanks to Bowser65 for some of the code provided below
+   */
+  const _injectMembers = async () => {
+    const MemberListItem = await getModuleByDisplayName('MemberListItem')
+    inject('bf-star-members', MemberListItem.prototype, 'renderDecorators', function (args, res) {
+      if (!isFavoriteFriend(this.props.user.id)) return res;
+      res.props.children.unshift(
+        React.createElement('div', { className: `bf-badge ${classes.topSectionNormal}` },
+          React.createElement(Star, { className: 'bf-star-member' })
+        )
+      )
+      return res
+    })
   }
+
+  const _injectMessages = async () => {
+    const MessageTimestamp = await getModule(['MessageTimestamp']);
+    inject('bf-star-messages', MessageTimestamp, 'default', (args, res) => {
+      if (!isFavoriteFriend(args[0].message.author.id)) return res;
+      const header = res.props.children[1];
+      // eslint-disable-next-line prefer-destructuring
+      header.props.children[3] = header.props.children[2];
+      header.props.children[2] = React.createElement('div', { className: `bf-badge ${classes.topSectionNormal}` },
+        React.createElement(Star)
+      )
+      return res
+    });
+    MessageTimestamp.default.displayName = 'MessageTimestamp';
+  }
+
+  _injectMembers();
+  _injectMessages();
 };
