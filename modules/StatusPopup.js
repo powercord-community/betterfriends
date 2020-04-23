@@ -25,8 +25,30 @@ module.exports = async function () {
   const Avatar = getOwnerInstance(avatarElement);
   // it can be better i think
   this.instances.avatar = Avatar._reactInternalFiber.child.child.child.child.child.return.child.type;
-  if (this.instances.avatar === 'a')
-    this.instances.avatar = Avatar._reactInternalFiber.child.return.child.child.child.child.child.child.child.child.child.type;
+  if (this.instances.avatar === 'a') this.instances.avatar = Avatar._reactInternalFiber.child.return.child.child.child.child.child.child.child.child.child.type;
+  this.createFriendPopup = (user, status) => {
+    powercord.api.notices.sendToast(`bf-friend-notification-${Math.random() * 100}`, {
+      icon: false,
+      className: 'bf-status-popup',
+      hideProgressBar: true,
+      header: `Friend ${FRIENDLY_STATEMENT[status]}`,
+      content: React.createElement(StatusHandler, {
+        status,
+        user,
+        Avatar: this.instances.avatar
+      }),
+      timeout: 5000,
+      style: {
+        bottom: '25px',
+        right: '25px',
+        height: 'auto',
+        display: 'block',
+        padding: '12px'
+      },
+      buttons: []
+    });
+  }
+
   const { getStatus } = await getModule([ 'getStatus' ]);
   const getUser = await getModule([ 'getUser', 'getCurrentUser' ]);
 
@@ -36,24 +58,7 @@ module.exports = async function () {
       const previous = this.FRIEND_DATA.statusStorage[res.id];
       if (previous && status !== previous) {
         this.log('Showing notification');
-        powercord.api.notices.sendToast(`bf-friend-notification-${Math.random() * 100}`, {
-          icon: false,
-          header: `Friend ${FRIENDLY_STATEMENT[status]}`,
-          content: React.createElement(StatusHandler, {
-            status,
-            user: res,
-            Avatar: this.instances.avatar
-          }),
-          timeout: 5000,
-          style: {
-            bottom: '25px',
-            right: '25px',
-            height: 'auto',
-            display: 'block',
-            padding: '12px'
-          },
-          buttons: []
-        });
+        this.createFriendPopup(res, status)
       }
 
       this.FRIEND_DATA.statusStorage[res.id] = status;

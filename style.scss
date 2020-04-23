@@ -147,4 +147,34 @@ html body .bf-ff-header { // html body is used to get a more precise selector
 
 .bf-status-popup {
    height: fit-content;
+
+   .header {
+      background-color: transparent;
+      box-shadow: none;
+      padding: 0;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+
+      > span {
+         display: none;
+      }
+   }
+
+   .contents {
+      padding: 0;
+
+      .inner {
+         background-color: transparent;
+         border: none;
+         padding-bottom: 0;
+         margin-bottom: 2px;
+      }
+   }
+
+   &-text {
+      color: #fff;
+      font-weight: 600;
+      margin-right: 8px;
+   }
 }
