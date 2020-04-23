@@ -35,21 +35,20 @@ module.exports = async function () {
     }
   };
 
-  // Overwrite the original `playSound` function
-  playSound.playSound = function (e) {
-    if (!doPlayCustomSound || !custom[e]) {
-      playSound.createSound(e).play();
-    } else {
-      play(e);
+  inject('bf-playSound', playSound, 'playSound', e => {
+    if (doPlayCustomSound && custom[e[0]]) {
+      play(e[0]);
       if (doPlayCustomSound) doPlayCustomSound = false;
+      return false;
     }
-  };
+    return e;
+  }, true);
 
   inject('bf-notification', makeTextChatNotification, 'makeTextChatNotification', (args, res) => {
     const self = getCurrentUser();
     const message = args[1];
     if (self.id !== message.author.id) {
-      if (isFavoriteFriend(message.author.id)) {
+      if (isFavoriteFriend(message.author.id) && custom['message1']) {
         this.log('Playing custom sound for favorited friend')
         doPlayCustomSound = true;
       }

@@ -41,7 +41,6 @@ module.exports = async function () {
       )
       return res
     });
-    MessageTimestamp.default.displayName = 'MessageTimestamp';
   }
 
   _injectMembers();

@@ -25,7 +25,8 @@ module.exports = ({
     InformationModal: [ 'bf-message-listener' ],
     StatusPopup: [ 'bf-user' ],
     ChannelTypingIntegration: [ 'bf-ct-integration' ],
-    SpotifyIntegration: [ 'bf-spotify-integration' ]
+    SpotifyIntegration: [ 'bf-spotify-integration' ],
+    NotificationSounds: [ 'bf-notification', 'bf-playSound' ]
   },
   Sounds: {
     message1: 'Message',
