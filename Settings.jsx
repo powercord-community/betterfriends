@@ -153,7 +153,7 @@ module.exports = class Settings extends React.Component {
         </div>
         {Object.keys(Sounds)
           .map((sound) =>
-            <div className='bf-notification-sounds'>
+            <div className='bf-notification-sounds' style={{ marginBottom: '16px' }}>
               <div style={{ float: 'left' }}>
                 <Text className='title-31JmR4 titleDefault-a8-ZSr medium-zmzTW- size16-14cGz5 height20-mO2eIN'>
                   <label className='title-31JmR4 titleDefault-a8-ZSr medium-zmzTW- size16-14cGz5 height20-mO2eIN'>
