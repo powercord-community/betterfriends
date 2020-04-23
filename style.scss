@@ -147,6 +147,8 @@ html body .bf-ff-header { // html body is used to get a more precise selector
 
 .bf-status-popup {
    height: fit-content;
+   width: fit-content;
+   background-color: #212121;
 
    .header {
       background-color: transparent;
