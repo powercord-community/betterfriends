@@ -36,11 +36,18 @@ module.exports = class InformationModal extends React.Component {
   }
 
   async componentDidMount () {
+    const getUser = (await getModule([ 'getUser' ])).getUser;
+    const getGuild = (await getModule([ 'getGuild' ])).getGuild;
+    const getChannel = (await getModule([ 'getChannel' ])).getChannel;
+    const channel = await getChannel(this.props.channel);
     this.setState({
-      getChannel: (await getModule([ 'getChannel' ])).getChannel,
-      getUser: (await getModule([ 'getUser' ])).getUser,
-      getGuild: (await getModule([ 'getGuild' ])).getGuild,
-      extractTimestamp: (await getModule([ 'extractTimestamp' ])).extractTimestamp
+      getChannel,
+      getUser,
+      getGuild,
+      extractTimestamp: (await getModule([ 'extractTimestamp' ])).extractTimestamp,
+      user: await getUser(this.props.user.id),
+      channel,
+      guild: channel ? await getGuild(channel.guild_id) : null
     });
   }
 
@@ -48,7 +55,7 @@ module.exports = class InformationModal extends React.Component {
     if (!this.state) {
       return null;
     }
-    const { getUser, getChannel, getGuild, extractTimestamp } = this.state;
+    const { user, channel, guild, extractTimestamp } = this.state;
     return (
       <Confirm
         red={false}
@@ -58,14 +65,11 @@ module.exports = class InformationModal extends React.Component {
       >
         <div className='bf-information-modal'>
           {(() => {
-            const { username } = getUser(this.props.user.id);
-            const channel = getChannel(this.props.channel);
             if (!channel) {
-              return (<div className='text-2F8PnX marginBottom20-32qID7 primary-jw0I4K'>{username} hasn't been seen anywhere recently.</div>);
+              return (<div className='text-2F8PnX colorStandard-2KCXvj marginBottom20-32qID7 primary-jw0I4K'>{user.username} hasn't been seen anywhere recently.</div>);
             }
-            const guild = getGuild(channel.guild_id);
             const timestamp = extractTimestamp(this.props.message);
-            return (<div className='text-2F8PnX marginBottom20-32qID7 primary-jw0I4K'>{username} was last seen in {guild
+            return (<div className='text-2F8PnX colorStandard-2KCXvj marginBottom20-32qID7 primary-jw0I4K'>{user.username} was last seen in {guild
               ? <span><span className='wrapperHover-1GktnT wrapper-3WhCwL'>#{channel.name}</span> ({guild.name})</span>
               : channel.recipients.length <= 2 ? 'your DMs' : <span className='wrapperHover-1GktnT wrapper-3WhCwL'>{channel.name}</span>
             } around {this.parse((Date.now() - timestamp) / 1000)} ago</div>);
