@@ -35,7 +35,10 @@ module.exports = class BetterFriends extends Plugin {
     powercord.api.settings.registerSettings('betterfriends', {
       category: 'betterfriends',
       label: 'Better Friends',
-      render: Settings
+      render: () =>
+        React.createElement(Settings, {
+          settings: this.settings
+        })
     });
 
     // Handle CSS
@@ -112,7 +115,7 @@ module.exports = class BetterFriends extends Plugin {
       }
     } else {
       this.log('Plugin stopped');
-      powercord.api.settings.unregisterSettings('betterfriends');
+      // powercord.api.settings.unregisterSettings('betterfriends');
       document.removeEventListener('click', this.clickListener);
       for (const unload of Object.keys(this.MODULES)) {
         for (const injection of (InjectionIDs[unload] || [])) {
