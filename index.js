@@ -21,18 +21,25 @@ module.exports = class BetterFriends extends Plugin {
       statuspopup: true
     };
 
-    // Register settings menu for BetterFriends
-    this.registerSettings(
-      'betterfriends',
-      'Better Friends',
-      () =>
-        React.createElement(Settings, {
-          settings: this.settings
-        })
-    );
+    /*
+     * Register settings menu for BetterFriends
+     * this.registerSettings(
+     *   'betterfriends',
+     *   'Better Friends',
+     *   () =>
+     *     React.createElement(Settings, {
+     *       settings: this.settings
+     *     })
+     * );
+     */
+    powercord.api.settings.registerSettings('betterfriends', {
+      category: 'betterfriends',
+      label: 'Better Friends',
+      render: Settings
+    });
 
     // Handle CSS
-    this.loadCSS(resolve(__dirname, 'style.scss'));
+    this.loadStylesheet(resolve(__dirname, 'style.scss'));
 
     // Constants
     this.FRIEND_DATA = {
@@ -105,6 +112,7 @@ module.exports = class BetterFriends extends Plugin {
       }
     } else {
       this.log('Plugin stopped');
+      powercord.api.settings.unregisterSettings('betterfriends');
       document.removeEventListener('click', this.clickListener);
       for (const unload of Object.keys(this.MODULES)) {
         for (const injection of (InjectionIDs[unload] || [])) {
