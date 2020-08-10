@@ -1,8 +1,6 @@
 const { Plugin } = require('powercord/entities');
 const { uninject } = require('powercord/injector');
-const { React } = require('powercord/webpack');
 const { forceUpdateElement } = require('powercord/util');
-const { resolve } = require('path');
 const Settings = require('./Settings');
 const { InjectionIDs } = require('./Constants');
 
@@ -22,17 +20,13 @@ module.exports = class BetterFriends extends Plugin {
     };
 
     // Register settings menu for BetterFriends
-    this.registerSettings(
-      'betterfriends',
-      'Better Friends',
-      () =>
-        React.createElement(Settings, {
-          settings: this.settings
-        })
-    );
-
+    powercord.api.settings.registerSettings('betterfriends', {
+      category: this.entityID,
+      label: 'Better Friends',
+      render: Settings
+    });
     // Handle CSS
-    this.loadCSS(resolve(__dirname, 'style.scss'));
+    this.loadStylesheet('style.scss');
 
     // Constants
     this.FRIEND_DATA = {
@@ -115,6 +109,7 @@ module.exports = class BetterFriends extends Plugin {
   }
 
   pluginWillUnload () {
+    powercord.api.settings.unregisterSettings('betterfriends');
     this.unload();
   }
 

@@ -8,7 +8,7 @@ module.exports = class Settings extends React.Component {
   constructor (props) {
     super(props);
 
-    const get = props.settings.get.bind(props.settings);
+    const get = props.getSetting
     this.plugin = powercord.pluginManager.get('betterfriends');
 
     this.state = {
@@ -193,7 +193,7 @@ module.exports = class Settings extends React.Component {
       value = defaultValue;
     }
 
-    this.props.settings.set(key, value);
+    this.props.updateSetting(key, value);
     this.setState({ [key]: value });
   }
 };
