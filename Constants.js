@@ -18,14 +18,14 @@ module.exports = ({
     }
   },
   InjectionIDs: {
-    ContextMenu: [ 'bf-contextmenu-listener' ],
+    ContextMenu: [ 'bf-DMUserContextMenu', 'bf-GroupDMUserContextMenu', 'bf-GuildChannelUserContextMenu' ],
     DisplayStar: [ 'bf-star-member', 'bf-star-message' ],
     FavoriteFriendChannel: [ 'bf-direct-messages', 'bf-direct-messages-channel', 'bf-direct-messages-mount' ],
     FavoriteFriendsSection: [ 'bf-favorite-friends-tabbar' ],
     InformationModal: [ 'bf-message-listener' ],
     StatusPopup: [ 'bf-user' ],
     ChannelTypingIntegration: [ 'bf-ct-integration' ],
-    SpotifyIntegration: [ 'bf-spotify-integration' ],
+    SpotifyIntegration: [ 'bf-spotify-integration', 'bf-spotify-integration2' ],
     NotificationSounds: [ 'bf-notification', 'bf-playSound' ]
   },
   Sounds: {
