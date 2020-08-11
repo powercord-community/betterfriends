@@ -20,18 +20,8 @@ module.exports = class BetterFriends extends Plugin {
       displaystar: true,
       statuspopup: true
     };
-
-    /*
-     * Register settings menu for BetterFriends
-     * this.registerSettings(
-     *   'betterfriends',
-     *   'Better Friends',
-     *   () =>
-     *     React.createElement(Settings, {
-     *       settings: this.settings
-     *     })
-     * );
-     */
+    
+    // Register settings menu for BetterFriends
     powercord.api.settings.registerSettings('betterfriends', {
       category: 'betterfriends',
       label: 'Better Friends',
