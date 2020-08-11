@@ -134,7 +134,7 @@ module.exports = class BetterFriends extends Plugin {
       this.log('Reloading all modules');
       this.unload();
       await this.start();
-      forceUpdateElement('.privateChannels-1nO12o');
+      forceUpdateElement('#private-channels');
     }
   }
 
