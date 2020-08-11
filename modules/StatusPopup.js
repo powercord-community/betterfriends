@@ -17,15 +17,7 @@ const FRIENDLY_STATEMENT = {
  */
 module.exports = async function () {
   if (!this.settings.get('statuspopup', true)) return;
-  const classes = {
-    ...await getModule([ 'avatar', 'wrapper' ]),
-    ...await getModule([ 'avatar', 'muted', 'selected' ])
-  }
-  const avatarElement = await waitFor(`.${classes.avatar} > .${classes.wrapper}`);
-  const Avatar = getOwnerInstance(avatarElement);
-  // it can be better i think
-  this.instances.avatar = Avatar._reactInternalFiber.child.child.child.child.child.return.child.type;
-  if (this.instances.avatar === 'a') this.instances.avatar = Avatar._reactInternalFiber.child.return.child.child.child.child.child.child.child.child.child.type;
+  const Avatar = await getModule(m => m && m.Sizes && typeof m === 'function' && m.Sizes['SIZE_32'] === 'SIZE_32');
   this.createFriendPopup = (user, status) => {
     powercord.api.notices.sendToast(`bf-friend-notification-${Math.random() * 100}`, {
       icon: false,
@@ -35,7 +27,7 @@ module.exports = async function () {
       content: React.createElement(StatusHandler, {
         status,
         user,
-        Avatar: this.instances.avatar
+        Avatar
       }),
       timeout: 5000,
       style: {
