@@ -23,7 +23,7 @@ module.exports = class Settings extends React.Component {
 
   async componentDidMount () {
     this.setState({
-      VerticalScroller: await getModuleByDisplayName('VerticalScroller'),
+      VerticalScroller: (await getModule(['AdvancedScrollerThin'])).AdvancedScrollerThin,
       Flex: await getModuleByDisplayName('Flex'),
       Text: await getModuleByDisplayName('Text'),
       PopoutList: await getModuleByDisplayName('PopoutList'),
