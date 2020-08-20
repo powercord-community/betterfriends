@@ -21,7 +21,6 @@ module.exports = async function () {
   for (const module of InjectionIDs.ContextMenu.map(id => id.replace('bf-', ''))) {
     const m = await getModule(m => m.default && m.default.displayName === module);
     inject(`bf-${module}`, m, 'default', (args, res) => {
-      console.log(args, res);
       const { id } = args[0].user;
       if (isFriend(id)) {
         const group = findInReactTree(res, c => Array.isArray(c) && c.find(item => item && item.props && item.props.id === 'block'));

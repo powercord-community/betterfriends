@@ -4,6 +4,7 @@ const { forceUpdateElement, sleep } = require('powercord/util');
 const { Icons: { Keyboard }, Tooltip } = require('powercord/components');
 const { React, Flux, getModuleByDisplayName, getModule, constants: { Routes } } = require('powercord/webpack');
 
+const FavoriteFriends = require('../components/FavoriteFriends');
 const InformationModal = require('../components/InformationModal');
 
 /*
@@ -11,7 +12,6 @@ const InformationModal = require('../components/InformationModal');
  * Creates and populates the "Favorited Friends" section on the private channel/DMs screen
  */
 module.exports = async function () {
-  this.expanded = true;
   const _this = this;
   const PrivateChannel = await getModuleByDisplayName('PrivateChannel');
   const ConnectedPrivateChannelsList = await getModule(m => m.default && m.default.displayName === 'ConnectedPrivateChannelsList');
@@ -21,10 +21,7 @@ module.exports = async function () {
   const channelStore = await getModule([ 'getChannel', 'getDMFromUserId' ]);
   const activityStore = await getModule([ 'getPrimaryActivity' ]);
   const statusStore = await getModule([ 'getStatus' ]);
-  const { lastMessageId } = await getModule([ 'lastMessageId' ]);
-  const { getDMFromUserId } = await getModule([ 'getDMFromUserId' ]);
   const classes = {
-    ...await getModule([ 'privateChannels' ]),
     ...await getModule([ 'channel', 'closeButton' ]),
     ...await getModule([ 'avatar', 'muted', 'selected' ]),
     ...await getModule([ 'privateChannelsHeaderContainer' ])
@@ -84,7 +81,7 @@ module.exports = async function () {
           const channelId = await dms.openPrivateChannel(userStore.getCurrentUser().id, this.props.user.id);
           // eslint-disable-next-line new-cap
           transition.transitionTo(Routes.CHANNEL('@me', channelId));
-          forceUpdateElement('.' + classes.privateChannels);
+          forceUpdateElement('#private-channels');
         };
       }
     }
@@ -139,36 +136,16 @@ module.exports = async function () {
     res.props.children = [
       // Previous elements
       ...res.props.children,
-      // Header
-      this.FAV_FRIENDS.length > 0 && (() => React.createElement('h2', { className: `bf-fav-friends-header ${classes.privateChannelsHeaderContainer} container-2ax-kl` },
-        [ React.createElement('span', { className: classes.headerText }, 'Favorite Friends'),
-          React.createElement('svg', {
-            className: `bf-expand-fav-friends ${this.expanded ? 'expanded' : 'collapsed'}`,
-            height: 15,
-            width: 20,
-            viewBox: '0 0 20 20',
-            onClick: async () => {
-              this.expanded = !this.expanded;
-              await sleep(10);
-              forceUpdateElement('.' + classes.privateChannels);
-            }
-          }, React.createElement('path', {
-            fill: 'rgb(185, 187, 190)',
-            d: 'M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z'
-          })
-          ) ]
-      )),
-      // Friends
-      this.expanded
-        ? () => this.FAV_FRIENDS
-          .sort((a, b) => lastMessageId(getDMFromUserId(b)) - lastMessageId(getDMFromUserId(a)))
-          .map(userId => React.createElement(ConnectedPrivateChannel, { userId, currentSelectedChannel: res.props.selectedChannelId }))
-        : null
+      // Favorite Friends
+      () => React.createElement(
+        FavoriteFriends,
+        { classes, ConnectedPrivateChannel, FAV_FRIENDS: this.FAV_FRIENDS, selectedChannelId: res.props.selectedChannelId, _this }
+      )
     ];
 
     return res;
   });
   ConnectedPrivateChannelsList.default.displayName = 'ConnectedPrivateChannelsList';
 
-  forceUpdateElement('.' + classes.privateChannels);
+  forceUpdateElement('#private-channels');
 };
