@@ -5,6 +5,11 @@ module.exports = class FavoriteFriends extends React.PureComponent {
         super(props);
 
         this.state = { expanded: props._this.expanded ?? true };
+        props._this.favFriendsInstance = this;
+    }
+
+    componentWillUnmount () {
+        delete this.props._this.favFriendsInstance;
     }
 
     render () {

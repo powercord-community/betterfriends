@@ -1,6 +1,5 @@
 const { Plugin } = require('powercord/entities');
 const { uninject } = require('powercord/injector');
-const { forceUpdateElement } = require('powercord/util');
 const Settings = require('./Settings');
 const { InjectionIDs } = require('./Constants');
 
@@ -99,7 +98,6 @@ module.exports = class BetterFriends extends Plugin {
       }
     } else {
       this.log('Plugin stopped');
-      document.removeEventListener('click', this.clickListener);
       for (const unload of Object.keys(this.MODULES)) {
         for (const injection of (InjectionIDs[unload] || [])) {
           uninject(injection);
@@ -129,7 +127,6 @@ module.exports = class BetterFriends extends Plugin {
       this.log('Reloading all modules');
       this.unload();
       await this.start();
-      forceUpdateElement('#private-channels');
     }
   }
 

@@ -1,6 +1,5 @@
 const { inject } = require('powercord/injector');
 const { open: openModal } = require('powercord/modal');
-const { forceUpdateElement, sleep } = require('powercord/util');
 const { Icons: { Keyboard }, Tooltip } = require('powercord/components');
 const { React, Flux, getModuleByDisplayName, getModule, constants: { Routes } } = require('powercord/webpack');
 
@@ -26,28 +25,6 @@ module.exports = async function () {
     ...await getModule([ 'avatar', 'muted', 'selected' ]),
     ...await getModule([ 'privateChannelsHeaderContainer' ])
   }
-
-  this.clickListener = (event) => {
-    let el = event.target;
-    const setElement = () => {
-      do {
-        if (el.matches('.' + classes.channel)) {
-          for (const elm of [ ...document.querySelectorAll('.' + classes.selected) ]) {
-            elm.classList.remove(classes.selected);
-          }
-          return el;
-        }
-        el = el.parentElement || el.parentNode;
-      } while (el !== null && el.nodeType === 1);
-    };
-    setElement();
-
-    if (el && el.classList && !el.classList.contains(classes.selected)) {
-      el.classList.add(classes.selected);
-    }
-  };
-
-  document.addEventListener('click', this.clickListener);
 
   // Patch PrivateChannel
   inject('bf-direct-messages-channel', PrivateChannel.prototype, 'render', function (args, res) {
@@ -81,7 +58,7 @@ module.exports = async function () {
           const channelId = await dms.openPrivateChannel(userStore.getCurrentUser().id, this.props.user.id);
           // eslint-disable-next-line new-cap
           transition.transitionTo(Routes.CHANNEL('@me', channelId));
-          forceUpdateElement('#private-channels');
+          if (_this.favFriendsInstance) _this.favFriendsInstance.forceUpdate();
         };
       }
     }
@@ -133,6 +110,7 @@ module.exports = async function () {
         return channel.type !== 1 || !this.FAV_FRIENDS.includes(channel.recipients[0]);
       });
 
+    if (this.favFriendsInstance) this.favFriendsInstance.forceUpdate();
     res.props.children = [
       // Previous elements
       ...res.props.children,
@@ -146,6 +124,4 @@ module.exports = async function () {
     return res;
   });
   ConnectedPrivateChannelsList.default.displayName = 'ConnectedPrivateChannelsList';
-
-  forceUpdateElement('#private-channels');
 };
