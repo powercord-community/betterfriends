@@ -94,6 +94,8 @@ module.exports = async function () {
         user,
         channel,
         selected,
+        channelName: user.username,
+        isMobile: statusStore.isMobileOnline(userId),
         status: statusStore.getStatus(userId),
         activities: activityStore.getActivities(userId),
         infoModal: powercord.api.settings.store.getSetting('betterfriends', 'infomodal'),
