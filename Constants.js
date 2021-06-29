@@ -18,7 +18,7 @@ module.exports = ({
     }
   },
   InjectionIDs: {
-    ContextMenu: [ 'bf-DMUserContextMenu', 'bf-GroupDMUserContextMenu', 'bf-GuildChannelUserContextMenu' ],
+    ContextMenu: [ 'bf-DMUserContextMenu', 'bf-GroupDMContextMenu', 'bf-GroupDMUserContextMenu', 'bf-GuildChannelUserContextMenu' ],
     DisplayStar: [ 'bf-star-member', 'bf-star-message' ],
     FavoriteFriendChannel: [ 'bf-direct-messages', 'bf-direct-messages-channel', 'bf-direct-messages-mount' ],
     FavoriteFriendsSection: [ 'bf-favorite-friends-tabbar' ],

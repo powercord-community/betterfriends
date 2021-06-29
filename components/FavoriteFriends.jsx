@@ -13,8 +13,8 @@ module.exports = class FavoriteFriends extends React.PureComponent {
     }
 
     render () {
-        const { classes, FAV_FRIENDS, _this } = this.props;
-        if (!classes || !FAV_FRIENDS || !FAV_FRIENDS.length) return null;
+        const { classes, FAV_FRIENDS, FAV_DMS, _this } = this.props;
+        if (!classes || !FAV_FRIENDS || !FAV_DMS || (!FAV_FRIENDS.length && !FAV_DMS.length)) return null;
         const { lastMessageId } = getModule([ 'lastMessageId' ], false);
         const { getDMFromUserId } = getModule([ 'getDMFromUserId' ], false);
 
@@ -40,9 +40,11 @@ module.exports = class FavoriteFriends extends React.PureComponent {
             </h2>,
             // Friends
             this.state.expanded
-                ? FAV_FRIENDS
-                    .sort((a, b) => lastMessageId(getDMFromUserId(b)) - lastMessageId(getDMFromUserId(a)))
-                    .map(userId => <this.props.ConnectedPrivateChannel userId={userId} currentSelectedChannel={this.props.selectedChannelId} />)
+                ? [...FAV_FRIENDS.map(x => [x, getDMFromUserId(x)]), ...FAV_DMS.map(x => [x, x])]
+                    .sort((a, b) => lastMessageId(b[1]) - lastMessageId(a[1]))
+                    .map(([id, cid]) => (
+                        <this.props.ConnectedPrivateChannel id={id} isDM={id === cid} currentSelectedChannel={this.props.selectedChannelId} />)
+                    )
                 : null
         ];
     }
