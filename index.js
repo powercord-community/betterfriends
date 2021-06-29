@@ -39,10 +39,9 @@ module.exports = class BetterFriends extends Plugin {
   async start () {
     this.instances = {};
     this.FAV_FRIENDS = this.settings.get('favfriends');
-    this.FAV_DMS = this.settings.get('favdms');
+    this.FAV_DMS = this.settings.get('favdms') || [];
     if (!this.FAV_FRIENDS) {
       this.FAV_FRIENDS = [];
-      this.FAV_DMS = [];
       for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
         if (this.DEFAULT_SETTINGS[setting] === undefined && !this.FAV_FRIENDS) { /* eslint-disable-line */ /* I know this is bad practice, hopefully I'll find a better solution soon */
           this.settings.set(this.settings.get(setting, this.DEFAULT_SETTINGS[setting]));
