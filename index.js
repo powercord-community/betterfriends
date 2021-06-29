@@ -39,6 +39,7 @@ module.exports = class BetterFriends extends Plugin {
   async start () {
     this.instances = {};
     this.FAV_FRIENDS = this.settings.get('favfriends');
+    this.FAV_DMS = this.settings.get('favdms') || [];
     if (!this.FAV_FRIENDS) {
       this.FAV_FRIENDS = [];
       for (const setting of Object.keys(this.DEFAULT_SETTINGS)) {
